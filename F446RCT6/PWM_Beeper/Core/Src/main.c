@@ -34,7 +34,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define BEEPER_VOLUME 20
+#define BEEPER_VOLUME 15
 
 /* USER CODE END PD */
 
@@ -83,7 +83,7 @@ const float frequency_1[] = {
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void set_prescaler(float frequency)
+void set_prescaler(float frequency) // 通过设置预分频器来得到需要的频率
 {
   __HAL_TIM_SET_PRESCALER(&htim2, (uint32_t)(100000.0 / frequency) - 1);
 }
@@ -96,14 +96,25 @@ void set_volume(uint8_t volume) // 0~100
 
 void play(float frequency, uint32_t duration)
 {
+  HAL_GPIO_WritePin(GPIOC, LED_R_Pin, GPIO_PIN_RESET);
   if (frequency >= 0.0) // 小于零不改变频率
   {
     set_prescaler(frequency);
   }
-  HAL_Delay(duration);
+  HAL_Delay(duration - 80);
+  HAL_GPIO_WritePin(GPIOC, LED_R_Pin, GPIO_PIN_SET);
+  HAL_Delay(80);
   set_volume(0);
   HAL_Delay(20);
   set_volume(BEEPER_VOLUME);
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM6)
+  {
+    HAL_GPIO_TogglePin(GPIOC, LED_B_Pin);
+  }
 }
 
 /* USER CODE END PFP */
@@ -114,9 +125,9 @@ void play(float frequency, uint32_t duration)
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -142,10 +153,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  set_volume(20);
+  set_volume(BEEPER_VOLUME);
 
   /* USER CODE END 2 */
 
@@ -153,7 +166,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // 扬基�?
+    // 播放扬基歌
     play(frequency_0[0], 480);  // 1
     play(-1.0, 480);            // 1
     play(frequency_0[1], 480);  // 2
@@ -191,31 +204,31 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // 歇一�?
+    // 歇一秒
     set_volume(0);
     HAL_Delay(1000);
-    set_volume(20);
+    set_volume(BEEPER_VOLUME);
   }
   /* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -231,16 +244,15 @@ void SystemClock_Config(void)
   }
 
   /** Activate the Over-Drive mode
-  */
+   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -257,9 +269,9 @@ void SystemClock_Config(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -271,14 +283,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
