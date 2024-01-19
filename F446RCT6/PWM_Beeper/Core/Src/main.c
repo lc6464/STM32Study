@@ -46,11 +46,52 @@
 
 /* USER CODE BEGIN PV */
 
+const float frequency_n1[] = {
+    130.81278,
+    146.83238,
+    164.81378,
+    174.61412,
+    195.99772,
+    220.00000,
+    246.94165,
+};
+
+const float frequency_0[] = {
+    261.62557,
+    293.66477,
+    329.62756,
+    349.22823,
+    391.99543,
+    440.00000,
+    493.88330,
+};
+
+const float frequency_1[] = {
+    523.25113,
+    587.32953,
+    659.25512,
+    698.45646,
+    783.99087,
+    880.00000,
+    987.76660,
+};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+void set_prescaler(float frequency)
+{
+  __HAL_TIM_SET_PRESCALER(&htim2, (uint32_t)(100000.0 / frequency) - 1);
+}
+
+void set_volume(uint8_t volume) // 0~100
+{
+  // mapping: 0~100 -> 0~900
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, volume * 9);
+}
 
 /* USER CODE END PFP */
 
@@ -92,6 +133,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  set_volume(20);
 
   /* USER CODE END 2 */
 
@@ -99,10 +141,189 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[1]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[2]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[2]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[1]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[4]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+
+
+
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[1]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[2]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(980);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[6]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[4]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+
+
+
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[1]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[2]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[3]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[2]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[1]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[6]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[4]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[5]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_n1[6]);
+    HAL_Delay(480);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    set_prescaler(frequency_0[0]);
+    HAL_Delay(980);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
+
+    HAL_Delay(980);
+    set_volume(0);
+    HAL_Delay(20);
+    set_volume(20);
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+    set_volume(0);
+    HAL_Delay(1000);
+    set_volume(20);
   }
   /* USER CODE END 3 */
 }
