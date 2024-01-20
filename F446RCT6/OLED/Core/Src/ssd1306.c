@@ -1,7 +1,7 @@
 #include "ssd1306.h"
 
 
-// Screenbuffer
+// Screen buffer
 uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 
 // Screen object
