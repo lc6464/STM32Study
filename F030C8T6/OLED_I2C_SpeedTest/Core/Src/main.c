@@ -144,7 +144,7 @@ int main(void)
 
   ssd1306_UpdateScreen(&hi2c1);
 
-  char buffer[8] = {0};
+  char buffer[11] = {0};
   uint8_t commands[] = {0, 0x21, 48, 105};
 
   HAL_TIM_Base_Start_IT(&htim6);
