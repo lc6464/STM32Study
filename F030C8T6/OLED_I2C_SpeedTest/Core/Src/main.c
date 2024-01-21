@@ -39,9 +39,11 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define SSD1306_REFRESH_START_5 SSD1306_WIDTH * 5
 #define SSD1306_REFRESH_START_6 SSD1306_WIDTH * 6
-#define TOTAL_START 1000
-#define TOTAL_END 9999
+#define SSD1306_REFRESH_START_7 SSD1306_WIDTH * 7
+#define TOTAL_START 100
+#define TOTAL_END 999
 
 /* USER CODE END PD */
 
@@ -140,8 +142,8 @@ int main(void)
   ssd1306_SetCursor(7, 0);
   ssd1306_WriteString("Speed Test", Font_11x18, White);
 
-  ssd1306_SetCursor(0, 32);
-  ssd1306_WriteString("FPS Times", Font_7x10, White);
+  ssd1306_SetCursor(0, 30);
+  ssd1306_WriteString("FPS", Font_7x10, White);
 
   ssd1306_UpdateScreen(&hi2c1);
 
@@ -149,10 +151,12 @@ int main(void)
 
   char buffer[17] = {0};
   // char formatter[11] = "%u     %lu\0";
-  char formatter[11] = "%u %lu\0\0\0";
+  // char formatter[11] = "%u %lu\0\0\0";
   // uint8_t total_length = 0;
   // uint8_t formatter_filling, last_fps_length = 0, fps_length = 0;
-  uint8_t commands[] = {0x21, 0x00, 70, 0xB6};
+  uint8_t commands5[] = {0xB5, 0x21, 0x00, 21};
+  uint8_t commands6[] = {0xB6, 0x21, 0x00, 21};
+  // uint8_t commands7[] = {0xB7, 0x21, 0x00, 28};
 
   HAL_TIM_Base_Start_IT(&htim6);
 
@@ -181,17 +185,26 @@ int main(void)
     }
     */
 
+    ssd1306_SetCursor(0, 40);
+    // sprintf(buffer, formatter, fps, ++total);
+    sprintf(buffer, "%u", fps);
+    ssd1306_WriteString(buffer, Font_7x10, White);
+
     ssd1306_SetCursor(0, 48);
-    sprintf(buffer, formatter, fps, ++total);
+    // sprintf(buffer, formatter, fps, ++total);
+    sprintf(buffer, "%lu", ++total);
     ssd1306_WriteString(buffer, Font_7x10, White);
 
     // total_length = get_length(total) * 7;
     // total_length = 28;
     // commands[2] = total_length + 42;
-    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, commands, 4, 100);
+    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, commands5, 4, 100);
 
     // HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_6], 42 + total_length, 100);
-    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_6], 70, 100);
+    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_5], 21, 100);
+
+    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, commands6, 4, 100);
+    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_6], 21, 100);
 
     times++;
 
