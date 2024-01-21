@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 
 #include <stdio.h>
+#include <math.h>
 #include "ssd1306.h"
 
 /* USER CODE END Includes */
@@ -38,8 +39,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define SSD1306_REFRESH_START_4 SSD1306_WIDTH * 4 + 48
-#define SSD1306_REFRESH_START_6 SSD1306_WIDTH * 6 + 48
+#define SSD1306_REFRESH_START_6 SSD1306_WIDTH * 6
+#define TOTAL_START 1000
+#define TOTAL_END 9999
 
 /* USER CODE END PD */
 
@@ -52,11 +54,10 @@
 
 /* USER CODE BEGIN PV */
 
-uint32_t total = 0;
+uint32_t total = TOTAL_START;
 uint16_t times = 0;
 uint16_t fps = 0;
-uint8_t b4_length = SSD1306_WIDTH - 93;
-uint8_t b6_length = SSD1306_WIDTH - 108;
+// char get_length_temp[11] = {0};
 
 /* USER CODE END PV */
 
@@ -68,20 +69,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM6)
   {
-    fps = times * 5;
+    fps = times;
     times = 0;
-
-    if (fps > 980)
-    {
-      b6_length = SSD1306_WIDTH - 100;
-    }
-
-    if (total > 98500)
-    {
-      b4_length = SSD1306_WIDTH - 70;
-    }
   }
 }
+
+/*
+uint8_t get_length(uint32_t num)
+{
+  uint8_t length = 0;
+  do
+  {
+    num /= 10;
+    length++;
+  } while (num != 0);
+  return length;
+}
+*/
 
 /* USER CODE END PFP */
 
@@ -137,15 +141,18 @@ int main(void)
   ssd1306_WriteString("Speed Test", Font_11x18, White);
 
   ssd1306_SetCursor(0, 32);
-  ssd1306_WriteString("Times:", Font_7x10, White);
-
-  ssd1306_SetCursor(0, 48);
-  ssd1306_WriteString("FPS:", Font_7x10, White);
+  ssd1306_WriteString("FPS Times", Font_7x10, White);
 
   ssd1306_UpdateScreen(&hi2c1);
 
-  char buffer[11] = {0};
-  uint8_t commands[] = {0, 0x21, 48, 105};
+  ssd1306_WriteCommand(&hi2c1, 0xB6);
+
+  char buffer[17] = {0};
+  // char formatter[11] = "%u     %lu\0";
+  char formatter[11] = "%u %lu\0\0\0";
+  // uint8_t total_length = 0;
+  // uint8_t formatter_filling, last_fps_length = 0, fps_length = 0;
+  uint8_t commands[] = {0x21, 0x00, 70, 0xB6};
 
   HAL_TIM_Base_Start_IT(&htim6);
 
@@ -155,23 +162,43 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    ssd1306_SetCursor(48, 32);
-    sprintf(buffer, "%lu", total++);
+    /*
+    fps_length = get_length(fps);
+    if (fps_length != last_fps_length)
+    {
+      last_fps_length = fps_length;
+      for (formatter_filling = 0; formatter_filling < 6 - fps_length; formatter_filling++)
+      {
+        formatter[formatter_filling + 2] = ' ';
+      }
+      formatter[(formatter_filling++) + 2] = '%';
+      formatter[(formatter_filling++) + 2] = 'l';
+      formatter[(formatter_filling++) + 2] = 'u';
+      for (; formatter_filling < 9; formatter_filling++)
+      {
+        formatter[formatter_filling + 2] = 0;
+      }
+    }
+    */
+
+    ssd1306_SetCursor(0, 48);
+    sprintf(buffer, formatter, fps, ++total);
     ssd1306_WriteString(buffer, Font_7x10, White);
 
-    ssd1306_SetCursor(48, 48);
-    sprintf(buffer, "%u", fps);
-    ssd1306_WriteString(buffer, Font_7x10, White);
+    // total_length = get_length(total) * 7;
+    // total_length = 28;
+    // commands[2] = total_length + 42;
+    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, commands, 4, 100);
 
-    commands[0] = 0xB4;
-    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, commands, 4, 10);
-    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_4], b4_length, 100);
-
-    commands[0] = 0xB6;
-    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, commands, 4, 10);
-    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_6], b6_length, 100);
+    // HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_6], 42 + total_length, 100);
+    HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_REFRESH_START_6], 70, 100);
 
     times++;
+
+    if (total == TOTAL_END)
+    {
+      total = TOTAL_START;
+    }
 
     /* USER CODE END WHILE */
 
