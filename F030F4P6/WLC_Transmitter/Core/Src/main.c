@@ -86,7 +86,7 @@ void send_time(void) // 给串口发时间
 
 void show_time(void) // 通过 I2C SSD1306 OLED 显示屏显示时间
 {
-
+  // SSD1306 相关代码还没准备好😒
 }
 
 /* USER CODE END PFP */
@@ -129,8 +129,6 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  uint8_t timeChanged = 0;
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,6 +138,7 @@ int main(void)
     if (get_time())
     {
       send_time();
+      show_time();
     }
 
     /* USER CODE END WHILE */
