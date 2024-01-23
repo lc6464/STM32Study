@@ -81,7 +81,7 @@ uint8_t get_time(void) // 获取时间
 
 void send_time(void) // 给串口发时间
 {
-  HAL_UART_Transmit(&huart1, (uint8_t *)timeString, 9, 500);
+  HAL_UART_Transmit(&huart1, (uint8_t *)timeString, 9, 200);
 }
 
 void show_time(void) // 通过 I2C SSD1306 OLED 显示屏显示时间
