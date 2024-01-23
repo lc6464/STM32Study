@@ -56,6 +56,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_i2c2_tx;
+extern TIM_HandleTypeDef htim6;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 extern UART_HandleTypeDef huart1;
@@ -230,6 +231,20 @@ void DMA1_Stream7_IRQHandler(void)
 }
 
 /**
+ * @brief This function handles TIM6 global interrupt and DAC1, DAC2 underrun error interrupts.
+ */
+void TIM6_DAC_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+
+  /* USER CODE END TIM6_DAC_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim6);
+  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+
+  /* USER CODE END TIM6_DAC_IRQn 1 */
+}
+
+/**
  * @brief This function handles DMA2 stream2 global interrupt.
  */
 void DMA2_Stream2_IRQHandler(void)
@@ -254,20 +269,22 @@ void DMA2_Stream7_IRQHandler(void)
   HAL_DMA_IRQHandler(&hdma_usart1_tx);
   /* USER CODE BEGIN DMA2_Stream7_IRQn 1 */
 
-  /* Clear the half transfer complete flag */
-  __HAL_DMA_CLEAR_FLAG(&hdma_usart1_tx, __HAL_DMA_GET_HT_FLAG_INDEX(&hdma_usart1_tx));
-
-  hdma_usart1_tx.State = HAL_DMA_STATE_READY;
-
-  /* Clear the transfer complete flag */
-  __HAL_DMA_CLEAR_FLAG(&hdma_usart1_tx, __HAL_DMA_GET_TC_FLAG_INDEX(&hdma_usart1_tx));
-
-  /* Process Unlocked */
-  __HAL_UNLOCK(&hdma_usart1_tx);
-
   /* USER CODE END DMA2_Stream7_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
+
+void HDMA_USART1_TX_TransferComplete(DMA_HandleTypeDef *hdma)
+{
+  __HAL_DMA_CLEAR_FLAG(hdma, __HAL_DMA_GET_HT_FLAG_INDEX(hdma));
+
+  hdma->State = HAL_DMA_STATE_READY;
+
+  /* Clear the transfer complete flag */
+  __HAL_DMA_CLEAR_FLAG(hdma, __HAL_DMA_GET_TC_FLAG_INDEX(hdma));
+
+  /* Process Unlocked */
+  __HAL_UNLOCK(hdma);
+}
 
 /* USER CODE END 1 */

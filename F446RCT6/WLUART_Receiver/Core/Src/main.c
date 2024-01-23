@@ -20,6 +20,7 @@
 #include "main.h"
 #include "dma.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -50,6 +51,7 @@
 /* USER CODE BEGIN PV */
 
 uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
+uint8_t transmit_data[] = "Hello World!\n";
 
 /* USER CODE END PV */
 
@@ -57,7 +59,13 @@ uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM6)
+  {
+    HAL_UART_Transmit_DMA(&huart1, transmit_data, sizeof(transmit_data) - 1);
+  }
+}
 
 /* USER CODE END PFP */
 
@@ -97,9 +105,11 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_UART_Receive_DMA(&huart1, uart_receive_buffer, UART_RECEIVE_BUFFER_SIZE);
+  HAL_TIM_Base_Start_IT(&htim6);
 
   /* USER CODE END 2 */
 
@@ -107,6 +117,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
