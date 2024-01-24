@@ -27,14 +27,18 @@ extern "C"
     {
         if (huart->Instance == USART1)
         {
-            if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) != RESET)
+            if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE))
             {
                 __HAL_UART_CLEAR_IDLEFLAG(huart);
 
                 HAL_UART_DMAStop(huart);
 
-                int bytes = sprintf(uart_idle_callback_buffer, "%ld\n", UART_RECEIVE_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(huart->hdmarx));
-                HAL_UART_Transmit_DMA(huart, (uint8_t *)uart_idle_callback_buffer, bytes);
+                uint32_t data_length = UART_RECEIVE_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(huart->hdmarx);
+
+                int sprintf_length = sprintf(uart_idle_callback_buffer, "%ld\n", data_length);
+
+                HAL_UART_Transmit_DMA(huart, (uint8_t *)uart_idle_callback_buffer, sprintf_length);
+
                 memset(uart_receive_buffer, 0, UART_RECEIVE_BUFFER_SIZE);
 
                 HAL_UART_Receive_DMA(huart, uart_receive_buffer, UART_RECEIVE_BUFFER_SIZE);
