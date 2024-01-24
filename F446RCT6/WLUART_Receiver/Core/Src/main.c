@@ -106,11 +106,9 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
   HAL_UART_Receive_DMA(&huart1, uart_receive_buffer, UART_RECEIVE_BUFFER_SIZE);
   HAL_TIM_Base_Start_IT(&htim6);
-
-  
-
 
   /* USER CODE END 2 */
 
