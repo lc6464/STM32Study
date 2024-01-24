@@ -1,4 +1,4 @@
-# STM32 Study: PWM_Beeper
+# STM32 Study: WLUART_Receiver
 
 这是一个简单的 STM32 学习项目，用于 UART 相关代码练习。
 

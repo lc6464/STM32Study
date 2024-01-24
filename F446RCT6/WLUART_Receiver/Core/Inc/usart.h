@@ -43,6 +43,7 @@ void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN Prototypes */
 
   void HDMA_USART1_TX_TransferComplete(DMA_HandleTypeDef *hdma);
+  void USART1_IDLECallback(UART_HandleTypeDef *huart);
 
 /* USER CODE END Prototypes */
 
