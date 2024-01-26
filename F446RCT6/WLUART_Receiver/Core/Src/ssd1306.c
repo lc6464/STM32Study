@@ -179,6 +179,8 @@ char ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color)
 //
 char ssd1306_WriteString(const char *str, FontDef Font, SSD1306_COLOR color)
 {
+    uint32_t i = 0;
+
     // Write until null-byte
     while (*str)
     {
@@ -190,7 +192,10 @@ char ssd1306_WriteString(const char *str, FontDef Font, SSD1306_COLOR color)
 
         // Next char
         str++;
+        i++;
     }
+
+    str -= i; // Go back to the start of the string
 
     // Everything ok
     return *str;

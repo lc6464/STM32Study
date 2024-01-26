@@ -103,9 +103,11 @@ int main(void)
 
   if (ssd1306_Init(&hi2c2) != 0)
   {
-    HAL_UART_Transmit_DMA(&huart1, (uint8_t *)"SSD1306 Init ERROR!\n", 20);
+    HAL_UART_Transmit_DMA(&huart2, (uint8_t *)"SSD1306 Init ERROR!\n", 20);
     Error_Handler();
   }
+
+  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)"Hello, world!\n", 14);
 
   HAL_UART_Receive_DMA(&huart1, uart_receive_buffer, UART_RECEIVE_BUFFER_SIZE);
 
