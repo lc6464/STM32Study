@@ -2,7 +2,8 @@
  * This Library is written and optimized by Olivier Van den Eede(4ilo) in 2016
  * for Stm32 Uc and HAL-i2c lib's.
  *
- * To use this library with ssd1306 oled display you will need to customize the defines below.
+ * To use this library with ssd1306 oled display you will need to customize the
+ * defines below.
  *
  * This library uses 2 extra files (fonts.c/h).
  * In this files are 3 different fonts you can use:
@@ -15,8 +16,8 @@
 #ifndef _SSD1306_H
 #define _SSD1306_H
 
-#include "stm32f4xx_hal.h"
 #include "fonts.h"
+#include "stm32f4xx_hal.h"
 
 // I2c address
 #ifndef SSD1306_I2C_ADDR
@@ -44,21 +45,19 @@
 //
 //  Enumeration for screen colors
 //
-typedef enum
-{
-    Black = 0x00, // Black color, no pixel
-    White = 0x01, // Pixel is set. Color depends on LCD
+typedef enum {
+  Black = 0x00, // Black color, no pixel
+  White = 0x01, // Pixel is set. Color depends on LCD
 } SSD1306_COLOR;
 
 //
 //  Struct to store transformations
 //
-typedef struct
-{
-    uint16_t CurrentX;
-    uint16_t CurrentY;
-    uint8_t Inverted;
-    uint8_t Initialized;
+typedef struct {
+  uint16_t CurrentX;
+  uint16_t CurrentY;
+  uint8_t Inverted;
+  uint8_t Initialized;
 } SSD1306_t;
 
 //

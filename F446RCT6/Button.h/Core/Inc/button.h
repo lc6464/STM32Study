@@ -49,9 +49,9 @@
  */
 #ifndef _BUTTON_H_
 #define _BUTTON_H_
-#include "main.h"
 #include "SEML_common.h"
 #include "gpio_if.h"
+#include "main.h"
 #ifndef USE_EXTERN_BUTTON_CONFIG
 
 /// @brief 按键采样滤波窗口大小
@@ -94,43 +94,42 @@
 /**
  * @brief 按键按下事件
  */
-typedef enum
-{
-	Press_None = 0,		 /**< 无按键事件 */
-	Press_Up,					 /**< 按键松开 */
-	Press_Down,				 /**< 按键按下 */
-	Single_Clink,			 /**< 单击按键 */
-	Double_Clink,			 /**< 双击按键 */
-	Multiple_clicks,	 /**< 多次点击(>2次) */
-	Long_Press_Start,	 /**< 按键长按开始 */
-	Long_Press_Hold,	 /**< 按键长按 */
-	Long_press_Release /**< 按键长按释放 */
+typedef enum {
+  Press_None = 0,    /**< 无按键事件 */
+  Press_Up,          /**< 按键松开 */
+  Press_Down,        /**< 按键按下 */
+  Single_Clink,      /**< 单击按键 */
+  Double_Clink,      /**< 双击按键 */
+  Multiple_clicks,   /**< 多次点击(>2次) */
+  Long_Press_Start,  /**< 按键长按开始 */
+  Long_Press_Hold,   /**< 按键长按 */
+  Long_press_Release /**< 按键长按释放 */
 } Button_Event_t;
 /// @brief 是否为按键事件
-#define IS_BUTTON_EVENT(a) (a == Press_None || a == Press_Up || a == Press_Down ||            \
-														a == Single_Clink || a == Double_Clink || a == Multiple_clicks || \
-														a == Long_Press_Start || a == Long_Press_Hold || a == Long_press_Release)
+#define IS_BUTTON_EVENT(a)                                                     \
+  (a == Press_None || a == Press_Up || a == Press_Down || a == Single_Clink || \
+   a == Double_Clink || a == Multiple_clicks || a == Long_Press_Start ||       \
+   a == Long_Press_Hold || a == Long_press_Release)
 /// @brief 按键事件数量
 #define Button_Event_Num 8
 /// @brief 按键句柄结构体
-typedef struct
-{
-	uint8_t event : 4;															/**< 按键事件 */
-	uint8_t status : 3;															/**< 按键状态 */
-	uint8_t long_press_flag : 1;										/**< 是否为长按 */
-	uint8_t active_level : 1;												/**< 按键真电平 */
-	uint8_t clicks_count : 7;												/**< 点击次数 */
-	uint8_t press_count;														/**< 按键滤波计数 */
-	uint32_t press_down_time;												/**< 按下时间 */
-	uint32_t press_up_time;													/**< 松开时间 */
-	#ifdef USE_SEML_LIB
-	GPIO_Handle_t GPIO_Handle;
-	#else
-	uint8_t (*get_level_fun)(void *);								/**< 获取按键电平函数 */
-	void *get_level_conf;														/**< 获取按键电平配置 */
-	#endif
-	void (*callback_fun[Button_Event_Num])(void *); /**< 按键回调函数 */
-	void *next;																			/**< 链表指针 */
+typedef struct {
+  uint8_t event : 4;           /**< 按键事件 */
+  uint8_t status : 3;          /**< 按键状态 */
+  uint8_t long_press_flag : 1; /**< 是否为长按 */
+  uint8_t active_level : 1;    /**< 按键真电平 */
+  uint8_t clicks_count : 7;    /**< 点击次数 */
+  uint8_t press_count;         /**< 按键滤波计数 */
+  uint32_t press_down_time;    /**< 按下时间 */
+  uint32_t press_up_time;      /**< 松开时间 */
+#ifdef USE_SEML_LIB
+  GPIO_Handle_t GPIO_Handle;
+#else
+  uint8_t (*get_level_fun)(void *); /**< 获取按键电平函数 */
+  void *get_level_conf;             /**< 获取按键电平配置 */
+#endif
+  void (*callback_fun[Button_Event_Num])(void *); /**< 按键回调函数 */
+  void *next;                                     /**< 链表指针 */
 } Button_t;
 
 /**
@@ -143,7 +142,10 @@ typedef struct
  * @brief 获取当前按键按下状态
  * @param button 按键句柄
  */
-#define Get_Button_Press(button) (((button)->event == Press_Down || (button)->event == Long_Press_Hold) ? Press_Down : Press_Up)
+#define Get_Button_Press(button)                                               \
+  (((button)->event == Press_Down || (button)->event == Long_Press_Hold)       \
+       ? Press_Down                                                            \
+       : Press_Up)
 #ifdef USE_SEML_LIB
 /**
  * @brief 按键初始化
@@ -160,7 +162,8 @@ void Button_Init(Button_t *button, FunctionalState active_level);
  * @param get_level_config 获取按键配置
  * @param active_level 按键按下电平
  */
-void Button_Init(Button_t *button, uint8_t (*get_level_fun)(void *), void *get_level_config, FunctionalState active_level);
+void Button_Init(Button_t *button, uint8_t (*get_level_fun)(void *),
+                 void *get_level_config, FunctionalState active_level);
 #endif
 
 /**
@@ -169,7 +172,8 @@ void Button_Init(Button_t *button, uint8_t (*get_level_fun)(void *), void *get_l
  * @param event 按键事件
  * @param callback_fun 事件回调函数
  */
-void Button_Register(Button_t *button, Button_Event_t event, void (*callback_fun)(Button_t *));
+void Button_Register(Button_t *button, Button_Event_t event,
+                     void (*callback_fun)(Button_t *));
 
 /**
  * @brief 按键状态更新函数
