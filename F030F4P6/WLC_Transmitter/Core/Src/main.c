@@ -72,8 +72,6 @@ uint8_t get_time(void) // 获取时间
     seconds = time.Seconds;
 
     sprintf(timeString, "%.2hu:%.2hu:%.2hu", time.Hours, time.Minutes, time.Seconds); // 格式化时间为字符串
-
-    timeString[8] = '\n'; // 换行
   }
 
   return timeChanged;
@@ -81,7 +79,7 @@ uint8_t get_time(void) // 获取时间
 
 void send_time(void) // 给串口发时间
 {
-  HAL_UART_Transmit(&huart1, (uint8_t *)timeString, 9, 200);
+  HAL_UART_Transmit(&huart1, (uint8_t *)timeString, 8, 200);
 }
 
 void show_time(void) // 通过 I2C SSD1306 OLED 显示屏显示时间
