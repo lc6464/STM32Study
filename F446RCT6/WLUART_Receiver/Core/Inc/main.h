@@ -47,10 +47,9 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
-#define UART_RECEIVE_BUFFER_SIZE 128
+#define UART_RECEIVE_BUFFER_SIZE 64
 
   extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
-  extern uint8_t transmit_data[14];
 
 /* USER CODE END EM */
 
