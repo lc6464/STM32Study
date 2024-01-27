@@ -49,7 +49,7 @@ extern "C" {
 
 #define UART_RECEIVE_BUFFER_SIZE 64
 
-  extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
+extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
 /* USER CODE END EM */
 

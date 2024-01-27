@@ -30,8 +30,7 @@ I2C_HandleTypeDef hi2c2;
 DMA_HandleTypeDef hdma_i2c2_tx;
 
 /* I2C2 init function */
-void MX_I2C2_Init(void)
-{
+void MX_I2C2_Init(void) {
 
   /* USER CODE BEGIN I2C2_Init 0 */
 
@@ -49,8 +48,7 @@ void MX_I2C2_Init(void)
   hi2c2.Init.OwnAddress2 = 0;
   hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
   hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
-  {
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN I2C2_Init 2 */
@@ -58,12 +56,10 @@ void MX_I2C2_Init(void)
   /* USER CODE END I2C2_Init 2 */
 }
 
-void HAL_I2C_MspInit(I2C_HandleTypeDef *i2cHandle)
-{
+void HAL_I2C_MspInit(I2C_HandleTypeDef *i2cHandle) {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if (i2cHandle->Instance == I2C2)
-  {
+  if (i2cHandle->Instance == I2C2) {
     /* USER CODE BEGIN I2C2_MspInit 0 */
 
     /* USER CODE END I2C2_MspInit 0 */
@@ -95,8 +91,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *i2cHandle)
     hdma_i2c2_tx.Init.Mode = DMA_NORMAL;
     hdma_i2c2_tx.Init.Priority = DMA_PRIORITY_LOW;
     hdma_i2c2_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_i2c2_tx) != HAL_OK)
-    {
+    if (HAL_DMA_Init(&hdma_i2c2_tx) != HAL_OK) {
       Error_Handler();
     }
 
@@ -113,11 +108,9 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *i2cHandle)
   }
 }
 
-void HAL_I2C_MspDeInit(I2C_HandleTypeDef *i2cHandle)
-{
+void HAL_I2C_MspDeInit(I2C_HandleTypeDef *i2cHandle) {
 
-  if (i2cHandle->Instance == I2C2)
-  {
+  if (i2cHandle->Instance == I2C2) {
     /* USER CODE BEGIN I2C2_MspDeInit 0 */
 
     /* USER CODE END I2C2_MspDeInit 0 */

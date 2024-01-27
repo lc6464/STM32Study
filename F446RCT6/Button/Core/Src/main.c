@@ -62,8 +62,9 @@ void lighting(uint16_t GPIO_Pin, GPIO_PinState PinState) // 控制 LED
 
 GPIO_PinState read_button(uint16_t GPIO_Pin) // 读取按钮状态
 {
-  GPIO_PinState state = !HAL_GPIO_ReadPin(GPIOB, GPIO_Pin); // 低电平有效，反转返回值
-  HAL_Delay(10);                                            // 延时消抖
+  GPIO_PinState state =
+      !HAL_GPIO_ReadPin(GPIOB, GPIO_Pin); // 低电平有效，反转返回值
+  HAL_Delay(10);                          // 延时消抖
   return state;
 }
 
@@ -73,15 +74,15 @@ GPIO_PinState read_button(uint16_t GPIO_Pin) // 读取按钮状态
  * @brief  The application entry point.
  * @retval int
  */
-int main(void)
-{
+int main(void) {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -103,11 +104,14 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    lighting(LED_R_Pin, !read_button(Button_SW1_Pin) && read_button(Button_SW2_Pin)); // SW2 按下时亮红灯
-    lighting(LED_G_Pin, read_button(Button_SW1_Pin) && !read_button(Button_SW2_Pin)); // SW1 按下时亮绿灯
-    lighting(LED_B_Pin, read_button(Button_SW1_Pin) && read_button(Button_SW2_Pin));  // SW1 和 SW2 同时按下时亮蓝灯
+  while (1) {
+    lighting(LED_R_Pin, !read_button(Button_SW1_Pin) &&
+                            read_button(Button_SW2_Pin)); // SW2 按下时亮红灯
+    lighting(LED_G_Pin, read_button(Button_SW1_Pin) &&
+                            !read_button(Button_SW2_Pin)); // SW1 按下时亮绿灯
+    lighting(LED_B_Pin,
+             read_button(Button_SW1_Pin) &&
+                 read_button(Button_SW2_Pin)); // SW1 和 SW2 同时按下时亮蓝灯
 
     /* USER CODE END WHILE */
 
@@ -120,8 +124,7 @@ int main(void)
  * @brief System Clock Configuration
  * @retval None
  */
-void SystemClock_Config(void)
-{
+void SystemClock_Config(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -142,28 +145,26 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
 
   /** Activate the Over-Drive mode
    */
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
-  {
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
    */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
+                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLRCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
     Error_Handler();
   }
 }
@@ -176,13 +177,11 @@ void SystemClock_Config(void)
  * @brief  This function is executed in case of error occurrence.
  * @retval None
  */
-void Error_Handler(void)
-{
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
-  while (1)
-  {
+  while (1) {
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -195,11 +194,11 @@ void Error_Handler(void)
  * @param  line: assert_param error line source number
  * @retval None
  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
+void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* User can add his own implementation to report the file name and line
+     number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
+     line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
