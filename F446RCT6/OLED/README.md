@@ -5,8 +5,8 @@
 ## 硬件要求
 
 - ZHKU 奇点战队 STM32F446RCT6 开发板
-- SSD1306 驱动的 I2C OLED 显示屏
-- CH341A USB - TTL
+- SSD1306 驱动的 0.96 寸 I2C OLED 屏幕
+- CH341A USB - TTL 模块
 
 ## 功能说明
 
