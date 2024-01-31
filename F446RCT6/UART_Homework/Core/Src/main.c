@@ -51,9 +51,10 @@
 uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
 int32_t a, b;
-int64_t c;
+int64_t c, a64, b64;
+uint64_t cu64;
 uint32_t d;
-uint8_t operation;
+uint8_t operation = 0, multiplication_sign = 0;
 
 char int64ToString_buffer[22];
 
@@ -167,8 +168,8 @@ int main(void)
       length = sprintf((char *)output_buffer, "%ld - %ld = %s\n", a, b, int64ToString_buffer);
       break;
     case '*':
-      int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld * %ld = %s\n", a, b, int64ToString_buffer);
+      int64ToString(cu64);
+      length = sprintf((char *)output_buffer, "%ld * %ld = %c%s\n", a, b, multiplication_sign == 0 ? 0 : '-', int64ToString_buffer);
       break;
     case '/':
       length = sprintf((char *)output_buffer, "%ld / %ld = %f\n", a, b, (float)a / (float)b);

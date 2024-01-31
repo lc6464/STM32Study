@@ -31,7 +31,9 @@ extern "C"
 
     if (sscanf(buffer, "%ld + %ld", &a, &b) == 2)
     {
-      c = (int64_t)a + (int64_t)b;
+      a64 = (int64_t)a;
+      b64 = (int64_t)b;
+      c = a64 + b64;
       operation = '+';
 
       return;
@@ -39,7 +41,9 @@ extern "C"
 
     if (sscanf(buffer, "%ld - %ld", &a, &b) == 2)
     {
-      c = (int64_t)a - (int64_t)b;
+      a64 = (int64_t)a;
+      b64 = (int64_t)b;
+      c = a64 - b64;
       operation = '-';
 
       return;
@@ -47,7 +51,11 @@ extern "C"
 
     if (sscanf(buffer, "%ld * %ld", &a, &b) == 2)
     {
-      c = (int64_t)a * (int64_t)b;
+      a64 = (int64_t)a;
+      b64 = (int64_t)b;
+      uint64_t au64 = (uint64_t)(a64 < 0 ? -a64 : a64), bu64 = (uint64_t)(b64 < 0 ? -b64 : b64);
+      multiplication_sign = (a64 < 0) ^ (b64 < 0);
+      cu64 = au64 * bu64;
       operation = '*';
 
       return;
