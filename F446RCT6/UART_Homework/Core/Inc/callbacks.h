@@ -4,13 +4,12 @@
 #define __CALLBACKS_H__
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include "main.h"
 
-    void USART1_IDLECallback(UART_HandleTypeDef *huart);
+void USART1_IDLECallback(UART_HandleTypeDef *huart);
 
 #ifdef __cplusplus
 }

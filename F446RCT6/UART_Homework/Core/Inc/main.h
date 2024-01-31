@@ -23,34 +23,33 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
-  /* Private includes ----------------------------------------------------------*/
-  /* USER CODE BEGIN Includes */
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
-  /* USER CODE END Includes */
+/* USER CODE END Includes */
 
-  /* Exported types ------------------------------------------------------------*/
-  /* USER CODE BEGIN ET */
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
 
-  /* USER CODE END ET */
+/* USER CODE END ET */
 
-  /* Exported constants --------------------------------------------------------*/
-  /* USER CODE BEGIN EC */
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
 
-  /* USER CODE END EC */
+/* USER CODE END EC */
 
-  /* Exported macro ------------------------------------------------------------*/
-  /* USER CODE BEGIN EM */
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
 
 #define UART_RECEIVE_BUFFER_SIZE 32
 
-  extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
+extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
   extern int32_t a, b;
   extern int64_t c, a64, b64;
@@ -58,14 +57,14 @@ extern "C"
   extern uint32_t d;
   extern uint8_t operation, multiplication_sign;
 
-  /* USER CODE END EM */
+/* USER CODE END EM */
 
-  /* Exported functions prototypes ---------------------------------------------*/
-  void Error_Handler(void);
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
-  /* USER CODE BEGIN EFP */
+/* USER CODE BEGIN EFP */
 
-  void ToggleLED(uint16_t pin);
+void ToggleLED(uint16_t pin);
 
 /* USER CODE END EFP */
 
@@ -75,9 +74,9 @@ extern "C"
 #define LED_G_Pin GPIO_PIN_14
 #define LED_G_GPIO_Port GPIOC
 
-  /* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 
-  /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
