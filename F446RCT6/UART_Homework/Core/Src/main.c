@@ -63,24 +63,16 @@ char int64ToString_buffer[22];
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void ToggleLED(uint16_t pin)
-{
-  HAL_GPIO_TogglePin(GPIOC, pin);
-}
+void ToggleLED(uint16_t pin) { HAL_GPIO_TogglePin(GPIOC, pin); }
 
-int int64ToString(int64_t value)
-{
+int int64ToString(int64_t value) {
   int length = 0;
-  if (value < 0)
-  {
+  if (value < 0) {
     // 对于负数，特殊处理 INT64_MIN
-    if (value == INT64_MIN)
-    {
+    if (value == INT64_MIN) {
       length = snprintf(int64ToString_buffer, 22, "-9223372036854775808");
       return length;
-    }
-    else
-    {
+    } else {
       length = snprintf(int64ToString_buffer, 22, "-");
       value = -value;
     }
@@ -89,15 +81,15 @@ int int64ToString(int64_t value)
   uint32_t high = (uint32_t)(value >> 32);
   uint32_t low = (uint32_t)value;
 
-  if (high > 0)
-  {
-    length += snprintf(int64ToString_buffer + length, 22 - length, "%lu", (uint32_t)high);
+  if (high > 0) {
+    length += snprintf(int64ToString_buffer + length, 22 - length, "%lu",
+                       (uint32_t)high);
     // 确保低位部分作为补充时，前导零不丢失
-    length += snprintf(int64ToString_buffer + length, 22 - length, "%08lu", (uint32_t)low);
-  }
-  else
-  {
-    length += snprintf(int64ToString_buffer + length, 22 - length, "%lu", (uint32_t)low);
+    length += snprintf(int64ToString_buffer + length, 22 - length, "%08lu",
+                       (uint32_t)low);
+  } else {
+    length += snprintf(int64ToString_buffer + length, 22 - length, "%lu",
+                       (uint32_t)low);
   }
 
   return length; // 返回生成的字符串长度
@@ -144,7 +136,8 @@ int main(void) {
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE); // 使能 USART 1 空闲中断
 
   HAL_UART_Receive_DMA(&huart1, uart_receive_buffer, UART_RECEIVE_BUFFER_SIZE);
-  HAL_UART_Transmit_DMA(&huart1, (uint8_t *)"Hello, please enter your text:\n", 31);
+  HAL_UART_Transmit_DMA(&huart1, (uint8_t *)"Hello, please enter your text:\n",
+                        31);
 
   uint16_t length;
   uint8_t output_buffer[128];
@@ -155,22 +148,25 @@ int main(void) {
   /* USER CODE BEGIN WHILE */
   while (1) {
     /* USER CODE END WHILE */
-    switch (operation)
-    {
+    switch (operation) {
     case '+':
       int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld + %ld = %s\n", a, b, int64ToString_buffer);
+      length = sprintf((char *)output_buffer, "%ld + %ld = %s\n", a, b,
+                       int64ToString_buffer);
       break;
     case '-':
       int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld - %ld = %s\n", a, b, int64ToString_buffer);
+      length = sprintf((char *)output_buffer, "%ld - %ld = %s\n", a, b,
+                       int64ToString_buffer);
       break;
     case '*':
       int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld * %ld = %s\n", a, b, int64ToString_buffer);
+      length = sprintf((char *)output_buffer, "%ld * %ld = %s\n", a, b,
+                       int64ToString_buffer);
       break;
     case '/':
-      length = sprintf((char *)output_buffer, "%ld / %ld = %f\n", a, b, (float)a / (float)b);
+      length = sprintf((char *)output_buffer, "%ld / %ld = %f\n", a, b,
+                       (float)a / (float)b);
       break;
     case 'n':
       length = sprintf((char *)output_buffer, "%lu\n", d);
