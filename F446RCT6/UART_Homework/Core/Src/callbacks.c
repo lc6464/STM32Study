@@ -26,34 +26,32 @@ void USART1_ReceiveProcessor(uint32_t data_length) {
     return;
   }
 
-    if (sscanf(buffer, "%ld + %ld", &a, &b) == 2)
-    {
-      a64 = (int64_t)a;
-      b64 = (int64_t)b;
-      c = a64 + b64;
-      operation = '+';
+  if (sscanf(buffer, "%ld + %ld", &a, &b) == 2) {
+    a64 = (int64_t)a;
+    b64 = (int64_t)b;
+    c = a64 + b64;
+    operation = '+';
 
     return;
   }
 
-    if (sscanf(buffer, "%ld - %ld", &a, &b) == 2)
-    {
-      a64 = (int64_t)a;
-      b64 = (int64_t)b;
-      c = a64 - b64;
-      operation = '-';
+  if (sscanf(buffer, "%ld - %ld", &a, &b) == 2) {
+    a64 = (int64_t)a;
+    b64 = (int64_t)b;
+    c = a64 - b64;
+    operation = '-';
 
     return;
   }
 
-    if (sscanf(buffer, "%ld * %ld", &a, &b) == 2)
-    {
-      a64 = (int64_t)a;
-      b64 = (int64_t)b;
-      uint64_t au64 = (uint64_t)(a64 < 0 ? -a64 : a64), bu64 = (uint64_t)(b64 < 0 ? -b64 : b64);
-      multiplication_sign = (a64 < 0) ^ (b64 < 0);
-      cu64 = au64 * bu64;
-      operation = '*';
+  if (sscanf(buffer, "%ld * %ld", &a, &b) == 2) {
+    a64 = (int64_t)a;
+    b64 = (int64_t)b;
+    uint64_t au64 = (uint64_t)(a64 < 0 ? -a64 : a64),
+             bu64 = (uint64_t)(b64 < 0 ? -b64 : b64);
+    multiplication_sign = (a64 < 0) ^ (b64 < 0);
+    cu64 = au64 * bu64;
+    operation = '*';
 
     return;
   }
