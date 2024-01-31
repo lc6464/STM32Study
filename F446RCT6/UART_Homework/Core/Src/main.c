@@ -153,10 +153,11 @@ int main(void) {
     case '+':
     case '-':
     case '*':
-      // 下面的 float 统一了以后可以把 sprintf 扔到下面去，减少代码量？（似乎还有 n 的问题）
+      // 下面的 float 统一了以后可以把 sprintf
+      // 扔到下面去，减少代码量？（似乎还有 n 的问题）
       int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld %c %ld = %s\n", a, operation, b,
-                       int64ToString_buffer);
+      length = sprintf((char *)output_buffer, "%ld %c %ld = %s\n", a, operation,
+                       b, int64ToString_buffer);
       break;
     case '/':
       // 这个 float 可以考虑自己实现，减小编译结果的大小
