@@ -162,7 +162,9 @@ int main(void) {
       break;
     case '*':
       int64ToString(cu64);
-      length = sprintf((char *)output_buffer, "%ld * %ld = %c%s\n", a, b, multiplication_sign == 0 ? 0 : '-', int64ToString_buffer);
+      length =
+          sprintf((char *)output_buffer, "%ld * %ld = %c%s\n", a, b,
+                  multiplication_sign == 0 ? 0 : '-', int64ToString_buffer);
       break;
     case '/':
       length = sprintf((char *)output_buffer, "%ld / %ld = %f\n", a, b,
