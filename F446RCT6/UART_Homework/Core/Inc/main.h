@@ -52,10 +52,9 @@ extern "C" {
 extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
 extern int32_t a, b;
-extern int64_t c, a64, b64;
-extern uint64_t cu64;
+extern int64_t c;
 extern uint32_t d;
-extern uint8_t operation, multiplication_sign;
+extern uint8_t operation;
 
 /* USER CODE END EM */
 

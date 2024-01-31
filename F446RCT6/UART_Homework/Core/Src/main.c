@@ -51,10 +51,9 @@
 uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
 int32_t a, b;
-int64_t c, a64, b64;
-uint64_t cu64;
+int64_t c;
 uint32_t d;
-uint8_t operation = 0, multiplication_sign = 0;
+uint8_t operation = 0;
 
 char int64ToString_buffer[22];
 
@@ -79,6 +78,7 @@ int int64ToString(int64_t value) {
     }
   }
 
+  // 这里存在问题，输出大数会出现问题，这不是16进制，而是10进制
   uint32_t high = (uint32_t)(value >> 32);
   uint32_t low = (uint32_t)value;
 
@@ -151,22 +151,15 @@ int main(void) {
     /* USER CODE END WHILE */
     switch (operation) {
     case '+':
-      int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld + %ld = %s\n", a, b,
-                       int64ToString_buffer);
-      break;
     case '-':
-      int64ToString(c);
-      length = sprintf((char *)output_buffer, "%ld - %ld = %s\n", a, b,
-                       int64ToString_buffer);
-      break;
     case '*':
-      int64ToString(cu64);
-      length =
-          sprintf((char *)output_buffer, "%ld * %ld = %c%s\n", a, b,
-                  multiplication_sign == 0 ? 0 : '-', int64ToString_buffer);
+      // 下面的 float 统一了以后可以把 sprintf 扔到下面去，减少代码量？（似乎还有 n 的问题）
+      int64ToString(c);
+      length = sprintf((char *)output_buffer, "%ld %c %ld = %s\n", a, operation, b,
+                       int64ToString_buffer);
       break;
     case '/':
+      // 这个 float 可以考虑自己实现，减小编译结果的大小
       length = sprintf((char *)output_buffer, "%ld / %ld = %f\n", a, b,
                        (float)a / (float)b);
       break;

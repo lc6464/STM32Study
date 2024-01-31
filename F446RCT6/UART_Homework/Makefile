@@ -212,4 +212,7 @@ download:
 debug_init:
 	-openocd -f $(CONFIG_FILE) -f $(TARGET_FILE) -c init
 
+gdb:
+	-arm-none-eabi-gdb $(BUILD_DIR)/$(TARGET).elf
+
 # *** EOF ***
