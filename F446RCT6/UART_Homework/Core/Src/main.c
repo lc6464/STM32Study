@@ -125,12 +125,13 @@ int main(void) {
     case '-':
     case '*':
       int64ToString(c, toStringBuffer);
-      length = sprintf((char *)output_buffer, "%ld %c %ld = %s\n", a, operation, b,
-                       toStringBuffer);
+      length = sprintf((char *)output_buffer, "%ld %c %ld = %s\n", a, operation,
+                       b, toStringBuffer);
       break;
     case '/':
       floatToString(f, toStringBuffer);
-      length = sprintf((char *)output_buffer, "%ld / %ld = %s\n", a, b, toStringBuffer);
+      length = sprintf((char *)output_buffer, "%ld / %ld = %s\n", a, b,
+                       toStringBuffer);
       break;
     case 'n':
       length = sprintf((char *)output_buffer, "%lu\n", d);
