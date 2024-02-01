@@ -52,6 +52,7 @@ void USART1_ReceiveProcessor(uint32_t data_length) {
       HAL_UART_Transmit_DMA(&huart1, (uint8_t *)"Divisor cannot be zero!\n",
                             24);
     } else {
+      f = (float)a / (float)b;
       operation = '/';
     }
 

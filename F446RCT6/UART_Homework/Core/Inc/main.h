@@ -47,12 +47,15 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
+#define ToggleLED(pin) HAL_GPIO_TogglePin(GPIOC, pin)
+
 #define UART_RECEIVE_BUFFER_SIZE 32
 
 extern uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
 extern int32_t a, b;
 extern int64_t c;
+extern float f;
 extern uint32_t d;
 extern uint8_t operation;
 
@@ -62,8 +65,6 @@ extern uint8_t operation;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
-void ToggleLED(uint16_t pin);
 
 /* USER CODE END EFP */
 

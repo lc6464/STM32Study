@@ -26,6 +26,9 @@
 /* USER CODE BEGIN Includes */
 
 #include <stdio.h>
+#include <string.h>
+
+#include "strings.h"
 
 /* USER CODE END Includes */
 
@@ -52,49 +55,17 @@ uint8_t uart_receive_buffer[UART_RECEIVE_BUFFER_SIZE];
 
 int32_t a, b;
 int64_t c;
+float f;
 uint32_t d;
 uint8_t operation = 0;
 
-char int64ToString_buffer[22];
+char toStringBuffer[24];
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
-void ToggleLED(uint16_t pin) { HAL_GPIO_TogglePin(GPIOC, pin); }
-
-int int64ToString(int64_t value) {
-  int length = 0;
-  if (value < 0) {
-    // 对于负数，特殊处理 INT64_MIN
-    if (value == INT64_MIN) {
-      length = snprintf(int64ToString_buffer, 22, "-9223372036854775808");
-      return length;
-    } else {
-      length = snprintf(int64ToString_buffer, 22, "-");
-      value = -value;
-    }
-  }
-
-  // 这里存在问题，输出大数会出现问题，这不是16进制，而是10进制
-  uint32_t high = (uint32_t)(value >> 32);
-  uint32_t low = (uint32_t)value;
-
-  if (high > 0) {
-    length += snprintf(int64ToString_buffer + length, 22 - length, "%lu",
-                       (uint32_t)high);
-    // 确保低位部分作为补充时，前导零不丢失
-    length += snprintf(int64ToString_buffer + length, 22 - length, "%08lu",
-                       (uint32_t)low);
-  } else {
-    length += snprintf(int64ToString_buffer + length, 22 - length, "%lu",
-                       (uint32_t)low);
-  }
-
-  return length; // 返回生成的字符串长度
-}
 
 /* USER CODE END PFP */
 
@@ -141,7 +112,7 @@ int main(void) {
                         31);
 
   uint16_t length;
-  uint8_t output_buffer[128];
+  uint8_t output_buffer[64];
 
   /* USER CODE END 2 */
 
@@ -153,15 +124,13 @@ int main(void) {
     case '+':
     case '-':
     case '*':
-      // 下面的 float 统一了以后可以把 sprintf 扔到下面去，减少代码量？（似乎还有 n 的问题）
-      int64ToString(c);
+      int64ToString(c, toStringBuffer);
       length = sprintf((char *)output_buffer, "%ld %c %ld = %s\n", a, operation, b,
-                       int64ToString_buffer);
+                       toStringBuffer);
       break;
     case '/':
-      // 这个 float 可以考虑自己实现，减小编译结果的大小
-      length = sprintf((char *)output_buffer, "%ld / %ld = %f\n", a, b,
-                       (float)a / (float)b);
+      floatToString(f, toStringBuffer);
+      length = sprintf((char *)output_buffer, "%ld / %ld = %s\n", a, b, toStringBuffer);
       break;
     case 'n':
       length = sprintf((char *)output_buffer, "%lu\n", d);
