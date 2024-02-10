@@ -62,15 +62,12 @@ uint8_t prepared = 0;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if (prepared == 0)
-  {
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+  if (prepared == 0) {
     return;
   }
 
-  if (htim->Instance == TIM3)
-  {
+  if (htim->Instance == TIM3) {
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, permillage);
 
     compare += addition;
@@ -83,12 +80,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     return;
   }
 
-  if (htim->Instance == TIM6)
-  {
-    uint32_t length = sprintf((char *)text, "ADC Value: %u\nPermillage: %u\n", (uint16_t)adcValue, (uint16_t)permillage);
+  if (htim->Instance == TIM6) {
+    uint32_t length = sprintf((char *)text, "ADC Value: %u\nPermillage: %u\n",
+                              (uint16_t)adcValue, (uint16_t)permillage);
     HAL_UART_Transmit_DMA(&huart1, text, length);
-
-
 
     return;
   }
@@ -152,8 +147,7 @@ int main(void) {
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1) {
     adcValue = HAL_ADC_GetValue(&hadc);
 
     // mapping: 0~4095 -> 0~1000
