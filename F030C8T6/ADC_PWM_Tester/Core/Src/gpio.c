@@ -40,8 +40,7 @@
         * EXTI
      PA8   ------> RCC_MCO
 */
-void MX_GPIO_Init(void)
-{
+void MX_GPIO_Init(void) {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -57,7 +56,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 2 */
