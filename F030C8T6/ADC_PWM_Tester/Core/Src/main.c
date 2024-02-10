@@ -50,11 +50,11 @@
 
 /* USER CODE BEGIN PV */
 
-uint32_t adcValue;
-uint32_t permillage;
+uint32_t adcValue, permillage;
 uint8_t text[40];
 int8_t addition = 1;
 uint16_t compare = 0;
+uint8_t prepared = 0;
 
 /* USER CODE END PV */
 
@@ -62,8 +62,16 @@ uint16_t compare = 0;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  if (htim->Instance == TIM3) {
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (prepared == 0)
+  {
+    return;
+  }
+
+  if (htim->Instance == TIM3)
+  {
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, permillage);
 
     compare += addition;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, compare);
@@ -74,12 +82,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     return;
   }
-  if (htim->Instance == TIM6) {
-    uint32_t length = sprintf((char *)text, "ADC Value: %u\nPermillage: %u\n",
-                              (uint16_t)adcValue, (uint16_t)permillage);
+
+  if (htim->Instance == TIM6)
+  {
+    uint32_t length = sprintf((char *)text, "ADC Value: %u\nPermillage: %u\n", (uint16_t)adcValue, (uint16_t)permillage);
     HAL_UART_Transmit_DMA(&huart1, text, length);
 
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, permillage);
+
 
     return;
   }
@@ -136,16 +145,21 @@ int main(void) {
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 
+  HAL_ADC_PollForConversion(&hadc, 100);
+  prepared = 1;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1) {
-    HAL_ADC_PollForConversion(&hadc, 100);
+  while (1)
+  {
     adcValue = HAL_ADC_GetValue(&hadc);
 
     // mapping: 0~4095 -> 0~1000
     permillage = adcValue * 1000 / 4095;
+
+    HAL_ADC_PollForConversion(&hadc, 100);
 
     /* USER CODE END WHILE */
 
@@ -195,6 +209,7 @@ void SystemClock_Config(void) {
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
     Error_Handler();
   }
+  HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_HSE, RCC_MCODIV_1);
 }
 
 /* USER CODE BEGIN 4 */
