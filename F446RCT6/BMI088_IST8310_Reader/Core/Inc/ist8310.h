@@ -2,24 +2,21 @@
 
 #include <stdint.h>
 
-typedef struct IST8310_RawData
-{
-    float X;
-    float Y;
-    float Z;
+typedef struct IST8310_RawData {
+  float X;
+  float Y;
+  float Z;
 } IST8310_RawData;
 
-typedef enum IST8310_Status_e
-{
-    IST8310_OK = 0x00,
-    IST8310_I2C_Error = 0x01,
-    IST8310_ID_Error = 0x02,
+typedef enum IST8310_Status_e {
+  IST8310_OK = 0x00,
+  IST8310_I2C_Error = 0x01,
+  IST8310_ID_Error = 0x02,
 } IST8310_Status_e;
 
-typedef struct IST8310_t
-{
-    IST8310_Status_e Status;
-    IST8310_RawData Data;
+typedef struct IST8310_t {
+  IST8310_Status_e Status;
+  IST8310_RawData Data;
 } IST8310_t;
 
 extern IST8310_t ist8310_data;
@@ -34,10 +31,18 @@ extern IST8310_t ist8310_data;
 IST8310_Status_e IST8310_Init(IST8310_t *ist8310_data);
 
 // 基础读取函数
-#define IST8310_ReadSingleData(addr, data) HAL_I2C_Mem_Read(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr, I2C_MEMADD_SIZE_8BIT, &data, 1, 10)
-#define IST8310_WriteSingleData(addr, data) HAL_I2C_Mem_Write(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr, I2C_MEMADD_SIZE_8BIT, &data, 1, 10)
-#define IST8310_ReadMultiData(addr, data, length) HAL_I2C_Mem_Read(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr, I2C_MEMADD_SIZE_8BIT, data, length, 10)
-#define IST8310_WriteMultiData(addr, data, length) HAL_I2C_Mem_Write(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr, I2C_MEMADD_SIZE_8BIT, data, length, 10)
+#define IST8310_ReadSingleData(addr, data)                                     \
+  HAL_I2C_Mem_Read(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr,                \
+                   I2C_MEMADD_SIZE_8BIT, &data, 1, 10)
+#define IST8310_WriteSingleData(addr, data)                                    \
+  HAL_I2C_Mem_Write(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr,               \
+                    I2C_MEMADD_SIZE_8BIT, &data, 1, 10)
+#define IST8310_ReadMultiData(addr, data, length)                              \
+  HAL_I2C_Mem_Read(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr,                \
+                   I2C_MEMADD_SIZE_8BIT, data, length, 10)
+#define IST8310_WriteMultiData(addr, data, length)                             \
+  HAL_I2C_Mem_Write(&IST8310_I2C, (IST8310_I2C_ADDR << 1), addr,               \
+                    I2C_MEMADD_SIZE_8BIT, data, length, 10)
 
 // 功能函数
 HAL_StatusTypeDef IST8310_ReadMegData(IST8310_t *ist8310_data);
