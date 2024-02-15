@@ -7,11 +7,9 @@
 #include "strings.h"
 
 // 辅助函数：反转字符串
-static void reverse(char *str, int length)
-{
+static void reverse(char *str, int length) {
   int i = 0, j = length - 1;
-  while (i < j)
-  {
+  while (i < j) {
     char temp = str[i];
     str[i] = str[j];
     str[j] = temp;
@@ -21,17 +19,14 @@ static void reverse(char *str, int length)
 }
 
 // 将 int32_t 转换为字符串
-int int32ToString(int32_t x, char str[], uint16_t d)
-{
+int int32ToString(int32_t x, char str[], uint16_t d) {
   int i = 0, isNegative = 0;
 
-  if (d == 0)
-  {
+  if (d == 0) {
     d = 1;
   }
 
-  if (x < 0)
-  {
+  if (x < 0) {
     isNegative = 1;
     x = -x;
   }
@@ -42,13 +37,11 @@ int int32ToString(int32_t x, char str[], uint16_t d)
     x = x / 10;
   }
 
-  while (i < d)
-  { // 补前导零
+  while (i < d) { // 补前导零
     str[i++] = '0';
   }
 
-  if (isNegative)
-  { // 负数处理
+  if (isNegative) { // 负数处理
     str[i++] = '-';
   }
 
@@ -58,8 +51,7 @@ int int32ToString(int32_t x, char str[], uint16_t d)
 }
 
 // 将 int64_t 转换为字符串
-int int64ToString(int64_t x, char *output)
-{
+int int64ToString(int64_t x, char *output) {
   uint8_t isNegative = 0;
   if (x < 0) // 负数处理
   {
@@ -81,14 +73,11 @@ int int64ToString(int64_t x, char *output)
 
   int highStringLength = int32ToString(high, highString, 0), lowStringLength;
 
-  if (high)
-  {
+  if (high) {
     lowStringLength = int32ToString(low, lowString, 9); // 低位需要前导零
     memcpy(output, highString, highStringLength);
     memcpy(output + highStringLength, lowString, lowStringLength + 1);
-  }
-  else
-  {
+  } else {
     lowStringLength = int32ToString(low, output, 0); // 没有高位，低位无需前导零
   }
 
@@ -99,8 +88,7 @@ int int64ToString(int64_t x, char *output)
 #define MAX_DECIMAL_PLACES 6 // 可调整以确定小数点后的位数
 
 // 将 float 转换为字符串
-int floatToString(float value, char *output)
-{
+int floatToString(float value, char *output) {
   int isNegative = 0;
 
   // 检查特殊值（不检查了）
@@ -123,8 +111,7 @@ int floatToString(float value, char *output)
   */
 
   // 处理符号位
-  if (value < 0)
-  {
+  if (value < 0) {
     *output++ = '-';
     value = -value;
     isNegative = 1;
@@ -140,8 +127,7 @@ int floatToString(float value, char *output)
   output += intStringLength;
 
   // 如果没有小数部分，则直接返回整数字符串
-  if (floatPart == 0)
-  {
+  if (floatPart == 0) {
     *output = '\0';
     return intStringLength + isNegative;
   }
@@ -151,8 +137,7 @@ int floatToString(float value, char *output)
 
   // 计算小数部分
   char decimalString[MAX_DECIMAL_PLACES + 1];
-  for (int i = 0; i < MAX_DECIMAL_PLACES; ++i)
-  {
+  for (int i = 0; i < MAX_DECIMAL_PLACES; ++i) {
     floatPart *= 10;
     int digit = (int)floatPart;
     floatPart -= digit;
