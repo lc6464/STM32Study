@@ -65,10 +65,10 @@ void Error_Handler(void);
 #define EXTI_Accel_GPIO_Port GPIOA
 #define EXTI_Gyro_Pin GPIO_PIN_5
 #define EXTI_Gyro_GPIO_Port GPIOA
-#define IST8301_DReady_Pin GPIO_PIN_4
-#define IST8301_DReady_GPIO_Port GPIOC
-#define IST8301_Reset_Pin GPIO_PIN_5
-#define IST8301_Reset_GPIO_Port GPIOC
+#define IST8310_DReady_Pin GPIO_PIN_4
+#define IST8310_DReady_GPIO_Port GPIOC
+#define IST8310_Reset_Pin GPIO_PIN_5
+#define IST8310_Reset_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
