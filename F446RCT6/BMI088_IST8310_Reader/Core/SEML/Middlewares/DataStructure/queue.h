@@ -10,10 +10,11 @@
  * <tr><th>Date           <th>Version     <th>Author      <th>Description
  * <tr><td>2022-04-05     <td>1.0         <td>SY7_yellow  <td>实现最基础的队列
  * <tr><td>2023-07-16     <td>1.1-alpha   <td>SY7_yellow  <td>对其进行泛型化
- * <tr><td>2023-07-17     <td>1.1         <td>SY7_yellow  <td>使其能够代替栈的功能
- * <tr><td>2023-07-19     <td>1.2         <td>SY7_yellow  <td>使其支持静态数组
- * <tr><td>2023-8-7       <td>1.3-alpha   <td>SY7_yellow  <td>增加队列元素下标访问
- * <tr><td>2023-8-25      <td>1.4         <td>SY7_yellow  <td>使其线程安全
+ * <tr><td>2023-07-17     <td>1.1         <td>SY7_yellow
+ *<td>使其能够代替栈的功能 <tr><td>2023-07-19     <td>1.2         <td>SY7_yellow
+ *<td>使其支持静态数组 <tr><td>2023-8-7       <td>1.3-alpha   <td>SY7_yellow
+ *<td>增加队列元素下标访问 <tr><td>2023-8-25      <td>1.4         <td>SY7_yellow
+ *<td>使其线程安全
  * </table>
  * @details:
  * ============================================================================
@@ -78,22 +79,22 @@
 /**
  * @brief 满队处理方式
  */
-typedef enum
-{
-	queue_full_hander_error = 0, /**< 报错*/
-	queue_full_hander_reapply,	 /**< 重新申请内存*/
-	queue_full_hander_cover,		 /**< 覆盖队头*/
+typedef enum {
+  queue_full_hander_error = 0, /**< 报错*/
+  queue_full_hander_reapply,   /**< 重新申请内存*/
+  queue_full_hander_cover,     /**< 覆盖队头*/
 } queue_full_hander_t;
 // @brief 处理方式断言
-#define IS_QUEUE_FULL_HANDER(x) ((x) == queue_full_hander_error || (x) == queue_full_hander_reapply || (x) == queue_full_hander_cover)
+#define IS_QUEUE_FULL_HANDER(x)                                                \
+  ((x) == queue_full_hander_error || (x) == queue_full_hander_reapply ||       \
+   (x) == queue_full_hander_cover)
 
 /**
  * @brief 满队处理方式
  */
-typedef enum
-{
-	queue_read = 0, /**< 读取队列元素 */
-	queue_write,		/**< 写入队列元素 */
+typedef enum {
+  queue_read = 0, /**< 读取队列元素 */
+  queue_write,    /**< 写入队列元素 */
 } queue_read_while_t;
 // @brief 处理方式断言
 #define IS_QUEUE_READ_WHILE(x) ((x) == queue_read || (x) == queue_write)
@@ -101,30 +102,30 @@ typedef enum
 /**
  * @brief 队列错误码
  */
-typedef enum
-{
-	queue_no_error = 0,	 /**< 队列无错误						*/
-	queue_full_error,		 /**< 队列满								*/
-	queue_empty_error,	 /**< 队列空								*/
-	queue_reapply_error, /**< 队列内存再申请出错		*/
-	queue_config_error,	 /**< 队列配置出错					*/
-	queue_visit_error		 /**< 访问队列元素出错			*/
+typedef enum {
+  queue_no_error = 0,  /**< 队列无错误  */
+  queue_full_error,    /**< 队列满
+                        */
+  queue_empty_error,   /**< 队列空
+                        */
+  queue_reapply_error, /**< 队列内存再申请出错		*/
+  queue_config_error,  /**< 队列配置出错					*/
+  queue_visit_error    /**< 访问队列元素出错			*/
 } queue_error_code_t;
 
 /**
  * @brief 队列结构体
  */
-typedef struct
-{
-	void *address;												 /**< 队列初始地址			*/
-	uint16_t front;												 /**< 队列头指针				*/
-	uint16_t rear;												 /**< 队列尾指针				*/
-	uint16_t size;												 /**< 队列大小					*/
-	uint16_t elem_size;										 /**< 队列元素大小			*/
-	queue_full_hander_t full_hander : 2;	 /**< 满队处理方式			*/
-	uint8_t error_code : 4;								 /**< 队列错误码				*/
-	FunctionalState use_extern_buffer : 1; /**< 使用外部缓存数组	*/
-	SEML_LockType_t Lock : 1;							 /**< 互斥锁						*/
+typedef struct {
+  void *address;                         /**< 队列初始地址			*/
+  uint16_t front;                        /**< 队列头指针				*/
+  uint16_t rear;                         /**< 队列尾指针				*/
+  uint16_t size;                         /**< 队列大小					*/
+  uint16_t elem_size;                    /**< 队列元素大小			*/
+  queue_full_hander_t full_hander : 2;   /**< 满队处理方式   */
+  uint8_t error_code : 4;                /**< 队列错误码				*/
+  FunctionalState use_extern_buffer : 1; /**< 使用外部缓存数组	*/
+  SEML_LockType_t Lock : 1;              /**< 互斥锁              */
 } s_queue;
 
 /**
@@ -137,7 +138,9 @@ typedef struct
  * @attention 使用外部缓存数组时候满队处理方式不能使用queue_full_hander_reapply
  * @return 队列执行状态
  */
-SEML_StatusTypeDef InitQueue(s_queue *queue, const uint16_t elem_size, const uint16_t size, void *buffer, const queue_full_hander_t full_hander);
+SEML_StatusTypeDef InitQueue(s_queue *queue, const uint16_t elem_size,
+                             const uint16_t size, void *buffer,
+                             const queue_full_hander_t full_hander);
 
 /**
  * @brief 删除队列
@@ -200,7 +203,8 @@ uint16_t GetQueueLong(const s_queue *queue);
  * @param[in] status 读写状态
  * @return 队列执行状态
  */
-SEML_StatusTypeDef VisitQueueElem(s_queue *queue, uint16_t index, void *data, queue_read_while_t status);
+SEML_StatusTypeDef VisitQueueElem(s_queue *queue, uint16_t index, void *data,
+                                  queue_read_while_t status);
 
 /**
  * @} 队列结束

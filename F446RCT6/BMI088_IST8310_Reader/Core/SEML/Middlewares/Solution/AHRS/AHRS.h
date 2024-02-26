@@ -8,8 +8,9 @@
  * @par Change Log：
  * <table>
  * <tr><th>Date           <th>Version     <th>Author      <th>Description
- * <tr><td>2023-03-07     <td>0.1         <td>Chad  			<td>创建初始版本
- * <tr><td>2023-09-26     <td>1.0         <td>7_yellow    <td>移植到SEML库
+ * <tr><td>2023-03-07     <td>0.1         <td>Chad
+ *<td>创建初始版本 <tr><td>2023-09-26     <td>1.0         <td>7_yellow
+ *<td>移植到SEML库
  * </table>
  * @bug     : 不能融合磁力计，需要进行矫正
  * @todo    : 加入里程计和估测速度
@@ -17,7 +18,8 @@
  * ============================================================================
  *                       How to use this driver
  * ============================================================================
- * 1. 初始化IMU,磁力计后调用AHRS_Init初始化AHRS解算模块,如果没有使用磁力计可传入NULL
+ * 1.
+ *初始化IMU,磁力计后调用AHRS_Init初始化AHRS解算模块,如果没有使用磁力计可传入NULL
  * 不融合磁力计.
  * 2. 调用Calibrate_IMU_Offset矫正角速度零漂,校准成功返回SEML_OK,传感器故障返回
  * SEML_ERROR.校准超时返回SEML_TIMEOUT,此时可以使用以往矫正数据,需注意零飘受到温度和
@@ -50,8 +52,8 @@
  */
 #ifndef __AHRS_H_
 #define __AHRS_H_
-#include "SEML_common.h"
 #include "../../math/math_common.h"
+#include "SEML_common.h"
 /**
  * @addtogroup 解算库
  * @{
@@ -63,11 +65,10 @@
 /**
  * @brief 直角坐标系结构体
  */
-typedef struct
-{
-	float x;
-	float y;
-	float z;
+typedef struct {
+  float x;
+  float y;
+  float z;
 } Rectangular_Coordinate_t;
 
 /**
@@ -88,22 +89,24 @@ typedef Rectangular_Coordinate_t Mag_Data_t;
 /**
  * @brief 欧拉角数据
  */
-typedef struct
-{
-	float pitch;
-	float roll;
-	float yaw;
+typedef struct {
+  float pitch;
+  float roll;
+  float yaw;
 } Euler_Data_t;
 
 /**
  * @brief AHRS解算算法回调函数
  */
-typedef void (*AHRS_Calculate_fun_t)(float quat[4], float sample_time, Accel_Data_t *accel, Gyro_Data_t *gyro, Mag_Data_t *mag);
+typedef void (*AHRS_Calculate_fun_t)(float quat[4], float sample_time,
+                                     Accel_Data_t *accel, Gyro_Data_t *gyro,
+                                     Mag_Data_t *mag);
 
 /**
  * @brief 获取IMU数据回调函数
  */
-typedef void (*Get_IMU_fun_t)(void *config, Accel_Data_t *accel, Gyro_Data_t *gyro);
+typedef void (*Get_IMU_fun_t)(void *config, Accel_Data_t *accel,
+                              Gyro_Data_t *gyro);
 
 /**
  * @brief 获取磁力计数据回调函数
@@ -113,23 +116,22 @@ typedef void (*Get_Mag_fun_t)(void *config, Mag_Data_t *mag);
 /**
  * @brief AHRS句柄
  */
-typedef struct
-{
-	Euler_Data_t euler_angle;								 /**< 欧拉角 */
-	Accel_Data_t accel;											 /**< 加速度 */
-	Accel_Data_t real_accel;								 /**< 惯性坐标系下的加速度 */
-	Gyro_Data_t gyro;												 /**< 角速度 */
-	Mag_Data_t mag;													 /**< 磁场 */
-	float quat[4];													 /**< 姿态四元数 */
-	float g_norm;														 /**< 标定时的重力加速度 */
-	float sample_time;											 /**< 采样时间 */
-	Gyro_Data_t gyro_offset;								 /**< 角速度零偏校正值 */
-	AHRS_Calculate_fun_t AHRS_Calculate_fun; /**< AHRS解算算法 */
-	void *IMU_handle;												 /**< IMU句柄*/
-	Get_IMU_fun_t Get_IMU_fun;							 /**< 获取IMU数据函数 */
-	void *mag_handle;												 /**< 磁力计句柄*/
-	Get_Mag_fun_t Get_Mag_fun;							 /**< 获取磁力计数据函数 */
-	uint8_t count;
+typedef struct {
+  Euler_Data_t euler_angle; /**< 欧拉角 */
+  Accel_Data_t accel;       /**< 加速度 */
+  Accel_Data_t real_accel;  /**< 惯性坐标系下的加速度 */
+  Gyro_Data_t gyro;         /**< 角速度 */
+  Mag_Data_t mag;           /**< 磁场 */
+  float quat[4];            /**< 姿态四元数 */
+  float g_norm;             /**< 标定时的重力加速度 */
+  float sample_time;        /**< 采样时间 */
+  Gyro_Data_t gyro_offset;  /**< 角速度零偏校正值 */
+  AHRS_Calculate_fun_t AHRS_Calculate_fun; /**< AHRS解算算法 */
+  void *IMU_handle;                        /**< IMU句柄*/
+  Get_IMU_fun_t Get_IMU_fun;               /**< 获取IMU数据函数 */
+  void *mag_handle;                        /**< 磁力计句柄*/
+  Get_Mag_fun_t Get_Mag_fun;               /**< 获取磁力计数据函数 */
+  uint8_t count;
 } AHRS_t;
 
 extern float g_norm;
@@ -151,7 +153,10 @@ void AHRS_Get_Angle(const float quat[4], Euler_Data_t *euler_angle);
  * @param[in] Get_Mag_fun 获取磁场数据函数
  * @param[in] mag_handle 磁力计句柄
  */
-void AHRS_Init(AHRS_t *AHRS, float sample_time, AHRS_Calculate_fun_t AHRS_Calculate_fun, Get_IMU_fun_t Get_IMU_fun, void *IMU_handle, Get_Mag_fun_t Get_Mag_fun, void *mag_handle);
+void AHRS_Init(AHRS_t *AHRS, float sample_time,
+               AHRS_Calculate_fun_t AHRS_Calculate_fun,
+               Get_IMU_fun_t Get_IMU_fun, void *IMU_handle,
+               Get_Mag_fun_t Get_Mag_fun, void *mag_handle);
 
 /**
  * @brief 矫正角速度零飘
@@ -217,7 +222,8 @@ void AHRS_Update(AHRS_t *AHRS);
  * @param[out] vecBF 机体坐标系坐标
  * @param[in] q 四元数
  */
-void EarthFrameToBodyFrame(const Rectangular_Coordinate_t vecEF, Rectangular_Coordinate_t *vecBF, float q[4]);
+void EarthFrameToBodyFrame(const Rectangular_Coordinate_t vecEF,
+                           Rectangular_Coordinate_t *vecBF, float q[4]);
 
 /**
  * @brief 机体坐标系转换为世界坐标系
@@ -225,7 +231,8 @@ void EarthFrameToBodyFrame(const Rectangular_Coordinate_t vecEF, Rectangular_Coo
  * @param[out] vecBF 世界坐标系坐标
  * @param[in] q 四元数
  */
-void BodyFrameToEarthFrame(const Rectangular_Coordinate_t vecBF, Rectangular_Coordinate_t *vecEF, float q[4]);
+void BodyFrameToEarthFrame(const Rectangular_Coordinate_t vecBF,
+                           Rectangular_Coordinate_t *vecEF, float q[4]);
 
 /**
  * @} 航姿参考系统解算模块

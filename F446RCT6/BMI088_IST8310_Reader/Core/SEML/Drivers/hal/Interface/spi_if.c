@@ -9,18 +9,18 @@
  * @param[in] SPI_TransmitReceive SPI发送接收函数
  */
 void SEML_SPI_Register(SPI_Handle_t *SPI_Handle, void *hspi,
-                        SPI_Transmit_t SPI_Transmit, SPI_Receive_t SPI_Receive, SPI_TransmitReceive_t SPI_TransmitReceive)
-{
-    assert_param(SPI_Handle != NULL);
-    assert_param(hspi != NULL);
-    assert_param(SPI_Transmit != NULL);
-    assert_param(SPI_Receive != NULL);
-    assert_param(SPI_TransmitReceive != NULL);
+                       SPI_Transmit_t SPI_Transmit, SPI_Receive_t SPI_Receive,
+                       SPI_TransmitReceive_t SPI_TransmitReceive) {
+  assert_param(SPI_Handle != NULL);
+  assert_param(hspi != NULL);
+  assert_param(SPI_Transmit != NULL);
+  assert_param(SPI_Receive != NULL);
+  assert_param(SPI_TransmitReceive != NULL);
 
-    SPI_Handle->hspi = hspi;
-    SPI_Handle->SPI_Receive = SPI_Receive;
-    SPI_Handle->SPI_Transmit = SPI_Transmit;
-    SPI_Handle->SPI_TransmitReceive = SPI_TransmitReceive;
+  SPI_Handle->hspi = hspi;
+  SPI_Handle->SPI_Receive = SPI_Receive;
+  SPI_Handle->SPI_Transmit = SPI_Transmit;
+  SPI_Handle->SPI_TransmitReceive = SPI_TransmitReceive;
 }
 
 /**
@@ -30,12 +30,12 @@ void SEML_SPI_Register(SPI_Handle_t *SPI_Handle, void *hspi,
  * @param[in] Size 数据大小
  * @param[in] Timeout 超时时间
  */
-SEML_StatusTypeDef SEML_SPI_Receive(SPI_Handle_t *SPI_Handle, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-{
-    assert_param(SPI_Handle != NULL);
-    assert_param(pData != NULL);
+SEML_StatusTypeDef SEML_SPI_Receive(SPI_Handle_t *SPI_Handle, uint8_t *pData,
+                                    uint16_t Size, uint32_t Timeout) {
+  assert_param(SPI_Handle != NULL);
+  assert_param(pData != NULL);
 
-    return SPI_Handle->SPI_Receive(SPI_Handle->hspi, pData, Size, Timeout);
+  return SPI_Handle->SPI_Receive(SPI_Handle->hspi, pData, Size, Timeout);
 }
 
 /**
@@ -45,12 +45,12 @@ SEML_StatusTypeDef SEML_SPI_Receive(SPI_Handle_t *SPI_Handle, uint8_t *pData, ui
  * @param[in] Size 数据大小
  * @param[in] Timeout 超时时间
  */
-SEML_StatusTypeDef SEML_SPI_Transmit(SPI_Handle_t *SPI_Handle, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-{
-    assert_param(SPI_Handle != NULL);
-    assert_param(pData != NULL);
+SEML_StatusTypeDef SEML_SPI_Transmit(SPI_Handle_t *SPI_Handle, uint8_t *pData,
+                                     uint16_t Size, uint32_t Timeout) {
+  assert_param(SPI_Handle != NULL);
+  assert_param(pData != NULL);
 
-    return SPI_Handle->SPI_Transmit(SPI_Handle->hspi, pData, Size, Timeout);
+  return SPI_Handle->SPI_Transmit(SPI_Handle->hspi, pData, Size, Timeout);
 }
 
 /**
@@ -61,11 +61,13 @@ SEML_StatusTypeDef SEML_SPI_Transmit(SPI_Handle_t *SPI_Handle, uint8_t *pData, u
  * @param[in] Size 数据大小
  * @param[in] Timeout 超时时间
  */
-SEML_StatusTypeDef SEML_SPI_TransmitReceive(SPI_Handle_t *SPI_Handle, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size,uint32_t Timeout)
-{
-    assert_param(SPI_Handle != NULL);
-    assert_param(pTxData != NULL);
-    assert_param(pRxData != NULL);
+SEML_StatusTypeDef SEML_SPI_TransmitReceive(SPI_Handle_t *SPI_Handle,
+                                            uint8_t *pTxData, uint8_t *pRxData,
+                                            uint16_t Size, uint32_t Timeout) {
+  assert_param(SPI_Handle != NULL);
+  assert_param(pTxData != NULL);
+  assert_param(pRxData != NULL);
 
-    return SPI_Handle->SPI_TransmitReceive(SPI_Handle->hspi, pTxData, pRxData, Size, Timeout);
+  return SPI_Handle->SPI_TransmitReceive(SPI_Handle->hspi, pTxData, pRxData,
+                                         Size, Timeout);
 }

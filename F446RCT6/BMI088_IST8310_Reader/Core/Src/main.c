@@ -15,8 +15,8 @@
  *
  ******************************************************************************
  */
- /* USER CODE END Header */
- /* Includes ------------------------------------------------------------------*/
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
 #include "gpio.h"
@@ -31,9 +31,9 @@
 #include <math.h>
 #include <string.h>
 
-#include "../SEML/Middlewares/Solution/AHRS/AHRS.h"
 #include "../SEML/Drivers/bsp/BMI088/bmi088driver.h"
 #include "../SEML/Drivers/bsp/IST8310/ist8310driver.h"
+#include "../SEML/Middlewares/Solution/AHRS/AHRS.h"
 #include "../SEML/Middlewares/Solution/AHRS/Mahony/Mahony.h"
 #include "strings.h"
 
@@ -130,18 +130,15 @@ int main(void) {
   (&ist8310.I2C_Handle)->I2C_Mem_Write = HAL_I2C_Mem_Write;
   ist8310_Init(&ist8310);
 
-  AHRS_Init(&AHRS, 0.001f, Mahony_AHRS_Update, BMI088_Read, &BMI088, ist8310_read_mag, &ist8310); // 此处使用的是mahony算法解算数据
-  Calibrate_IMU_Offset(&AHRS); // 校准陀螺仪零偏
-
-
+  AHRS_Init(&AHRS, 0.001f, Mahony_AHRS_Update, BMI088_Read, &BMI088,
+            ist8310_read_mag, &ist8310); // 此处使用的是mahony算法解算数据
+  Calibrate_IMU_Offset(&AHRS);           // 校准陀螺仪零偏
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-
-
 
     /* USER CODE END WHILE */
 
@@ -155,8 +152,8 @@ int main(void) {
  * @retval None
  */
 void SystemClock_Config(void) {
-  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
    */
@@ -188,7 +185,7 @@ void SystemClock_Config(void) {
   /** Initializes the CPU, AHB and APB buses clocks
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
-    RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -229,6 +226,6 @@ void assert_failed(uint8_t *file, uint32_t line) {
   /* User can add his own implementation to report the file name and line
      number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
      line) */
-     /* USER CODE END 6 */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
