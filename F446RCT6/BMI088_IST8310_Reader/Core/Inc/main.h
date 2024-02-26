@@ -72,6 +72,9 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+#define RSTN_IST8310_Pin IST8310_Reset_Pin
+#define RSTN_IST8310_GPIO_Port IST8310_Reset_GPIO_Port
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
