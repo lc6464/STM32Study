@@ -2,9 +2,9 @@
 #define __BMI088_REG_H__
 
 /**
- * @Author         : 
- * @Date           : 
- * @LastEditTime   : 
+ * @Author         :
+ * @Date           :
+ * @LastEditTime   :
  * @Note           :
  * @Copyright(c)   :
  */
@@ -141,4 +141,3 @@
 #define GYRO_SELF_TEST_ON 0x01
 
 #endif
-
