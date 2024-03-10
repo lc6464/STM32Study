@@ -122,15 +122,17 @@ int main(void) {
 
     seconds = time.Seconds;
 
-    sprintf(timeString, "%.2hu:%.2hu:%.2hu", time.Hours, time.Minutes,
-            time.Seconds); // æ ¼å¼åŒ–æ—¶é—´ä¸ºå­—ç¬¦ä¸?
+    sprintf(
+        timeString, "%.2hu:%.2hu:%.2hu", time.Hours, time.Minutes,
+        time.Seconds); // æ ¼å¼åŒ–æ—¶é—´ä¸ºå­—ç¬¦ä¸?
 
     ssd1306_SetCursor(20, 23);
     ssd1306_WriteString(timeString, Font_11x18, White);
 
     timeString[8] = '\n'; // æ¢è¡Œ
-    HAL_UART_Transmit_DMA(&huart1, (uint8_t *)timeString,
-                          9); // è®? DMA ç»™ä¸²å£å‘æ—¶é—´
+    HAL_UART_Transmit_DMA(
+        &huart1, (uint8_t *)timeString,
+        9); // è®? DMA ç»™ä¸²å£å‘æ—¶é—´
 
     ssd1306_UpdateScreen(&hi2c2); // æ›´æ–°å±å¹•
 
