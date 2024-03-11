@@ -19,19 +19,17 @@
  /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
-#include "gpio.h"
 #include "i2c.h"
 #include "rtc.h"
 #include "usart.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-/*
+
 #include "fonts.h"
 #include "ssd1306.h"
-*/
-#include "U8G2_INIT.h"
 #include <stdio.h>
 
 /* USER CODE END Includes */
@@ -69,9 +67,9 @@ void SystemClock_Config(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
 
@@ -79,8 +77,7 @@ int main(void) {
 
 	/* MCU Configuration--------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick.
-	 */
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
@@ -102,30 +99,38 @@ int main(void) {
 	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-	/*
-
-	// Init lcd using one of the stm32HAL i2c typedefs
+	  // Init lcd using one of the stm32HAL i2c typedefs
 	if (ssd1306_Init(&hi2c2) != 0) {
 		Error_Handler();
 	}
 
-	*/
-
-	u8g2_t u8g2 = { 0 };
-
-	U8G2_Init(&u8g2);
-
-
-
+	/*
 	RTC_TimeTypeDef time;
 	char timeString[12];
 	uint8_t seconds = 0;
+	*/
+
+	ssd1306_SetCursor(23, 4);
+	ssd1306_WriteString("Happy", Font_16x26, White);
+	ssd1306_SetCursor(20, 40);
+	ssd1306_WriteString("Birthday", Font_11x18, White);
+
+	uint8_t set = 0;
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		if (set == 0 && HAL_GPIO_ReadPin(SW2_GPIO_Port, SW2_Pin) == GPIO_PIN_RESET) {
+			set = 1;
+			ssd1306_UpdateScreen(&hi2c2);
+			while (HAL_GPIO_ReadPin(SW2_GPIO_Port, SW2_Pin) == GPIO_PIN_RESET);
+		}
+
+
+
+		/*
 		HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
 		HAL_RTC_GetDate(&hrtc, NULL, RTC_FORMAT_BIN);
 
@@ -139,45 +144,41 @@ int main(void) {
 			timeString, "%.2hu:%.2hu:%.2hu", time.Hours, time.Minutes,
 			time.Seconds); // 将时间格式化为字符串，格式为 HH:MM:SS
 
-		u8g2_DrawUTF8(&u8g2, 20, 23, timeString); // 在屏幕上显示时间字符串
-		u8g2_SendBuffer(&u8g2); // 更新屏幕显示
 
-		/*
+
 		ssd1306_SetCursor(20, 23);
 		ssd1306_WriteString(timeString, Font_11x18, White);
 
-		timeString[8] = '\n'; // 补充换行符
+		timeString[8] = '\n'; // 补充换行�?
 		HAL_UART_Transmit_DMA(
-				&huart1, (uint8_t *)timeString,
-				9); // 通过串口发送时间字符串，长度为9，包括换行符
+			&huart1, (uint8_t *)timeString,
+			9); // 通过串口发�?�时间字符串，长度为9，包括换行符
 
 		ssd1306_UpdateScreen(&hi2c2); // 更新屏幕显示
 
-		*/
+	/* USER CODE END WHILE */
 
-		/* USER CODE END WHILE */
-
-		/* USER CODE BEGIN 3 */
+	/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void) {
 	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
 	/** Configure the main internal regulator output voltage
-	 */
+	*/
 	__HAL_RCC_PWR_CLK_ENABLE();
 	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
 	/** Initializes the RCC Oscillators according to the specified parameters
-	 * in the RCC_OscInitTypeDef structure.
-	 */
+	* in the RCC_OscInitTypeDef structure.
+	*/
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
 	RCC_OscInitStruct.LSEState = RCC_LSE_OFF;
@@ -193,15 +194,15 @@ void SystemClock_Config(void) {
 	}
 
 	/** Activate the Over-Drive mode
-	 */
+	*/
 	if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
 		Error_Handler();
 	}
 
 	/** Initializes the CPU, AHB and APB buses clocks
-	 */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
-		RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	*/
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+		| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -217,31 +218,31 @@ void SystemClock_Config(void) {
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void) {
 	/* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
+	  /* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
 	while (1) {
 	}
 	/* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line) {
 	/* USER CODE BEGIN 6 */
-	/* User can add his own implementation to report the file name and line
-		 number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
-		 line) */
-		 /* USER CODE END 6 */
+	  /* User can add his own implementation to report the file name and line
+		   number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
+		   line) */
+		   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
