@@ -19,7 +19,7 @@
 #include "fonts.h"
 #include "stm32f4xx_hal.h"
 
- // I2c address
+// I2c address
 #ifndef SSD1306_I2C_ADDR
 #define SSD1306_I2C_ADDR 0x78
 #endif // SSD1306_I2C_ADDR
