@@ -146,24 +146,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 		char buffer[64] = { 0 };
 
+		ssd1306_Fill(Black);
+
+		// 展示电机信息
+		ssd1306_SetCursor(0, 0);
+		ssd1306_WriteString("Motor  Info", Font_11x18, White);
+
+		ssd1306_SetCursor(0, 20);
+		ssd1306_WriteString("Angle:", Font_7x10, White);
+		ssd1306_SetCursor(0, 30);
+		ssd1306_WriteString("Speed:", Font_7x10, White);
+		ssd1306_SetCursor(0, 40);
+		ssd1306_WriteString("Torque:", Font_7x10, White);
+		ssd1306_SetCursor(0, 50);
+		ssd1306_WriteString("Temp:", Font_7x10, White);
+
 		// 写电�??? ID
 		ssd1306_SetCursor(58, 0);
 		ssd1306_WriteChar('1' + id, Font_11x18, White);
 
 		ssd1306_SetCursor(50, 20);
-		uint16ToString(motor_info[id].rotor_angle, buffer, 5);
+		uint16ToString(motor_info[id].rotor_angle, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
 		ssd1306_SetCursor(50, 30);
-		int16ToString(motor_info[id].rotor_speed, buffer, 5);
+		int16ToString(motor_info[id].rotor_speed, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
 		ssd1306_SetCursor(57, 40);
-		int16ToString(motor_info[id].torque_current, buffer, 5);
+		int16ToString(motor_info[id].torque_current, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
 		ssd1306_SetCursor(43, 50);
-		uint8ToString(motor_info[id].temperature, buffer, 3);
+		uint8ToString(motor_info[id].temperature, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
 		ssd1306_UpdateScreen(&hi2c2);
