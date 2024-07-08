@@ -140,74 +140,74 @@ void set_motor_voltage(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3,
 
 // 定时器中断回调函�???
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM6) {
-		//uint8_t id = ++show_count / 4;
-		uint8_t id = 1;
+  if (htim->Instance == TIM6) {
+    // uint8_t id = ++show_count / 4;
+    uint8_t id = 1;
 
-		if (show_count == 31) {
-			show_count = 0;
-		}
+    if (show_count == 31) {
+      show_count = 0;
+    }
 
-		char buffer[64] = { 0 };
+    char buffer[64] = {0};
 
-		ssd1306_Fill(Black);
+    ssd1306_Fill(Black);
 
-		// 展示电机信息
-		ssd1306_SetCursor(0, 0);
-		ssd1306_WriteString("Motor  Info", Font_11x18, White);
+    // 展示电机信息
+    ssd1306_SetCursor(0, 0);
+    ssd1306_WriteString("Motor  Info", Font_11x18, White);
 
-		ssd1306_SetCursor(0, 20);
-		ssd1306_WriteString("Angle:", Font_7x10, White);
-		ssd1306_SetCursor(0, 30);
-		ssd1306_WriteString("Speed:", Font_7x10, White);
-		ssd1306_SetCursor(0, 40);
-		ssd1306_WriteString("Torque:", Font_7x10, White);
-		ssd1306_SetCursor(0, 50);
-		ssd1306_WriteString("Temp:", Font_7x10, White);
+    ssd1306_SetCursor(0, 20);
+    ssd1306_WriteString("Angle:", Font_7x10, White);
+    ssd1306_SetCursor(0, 30);
+    ssd1306_WriteString("Speed:", Font_7x10, White);
+    ssd1306_SetCursor(0, 40);
+    ssd1306_WriteString("Torque:", Font_7x10, White);
+    ssd1306_SetCursor(0, 50);
+    ssd1306_WriteString("Temp:", Font_7x10, White);
 
-		// 写电�??? ID
-		ssd1306_SetCursor(58, 0);
-		ssd1306_WriteChar('1' + id, Font_11x18, White);
+    // 写电�??? ID
+    ssd1306_SetCursor(58, 0);
+    ssd1306_WriteChar('1' + id, Font_11x18, White);
 
-		ssd1306_SetCursor(50, 20);
-		uint16ToString(motor_info[id].rotor_angle, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+    ssd1306_SetCursor(50, 20);
+    uint16ToString(motor_info[id].rotor_angle, buffer, 0);
+    ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(50, 30);
-		int16ToString(motor_info[id].rotor_speed, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+    ssd1306_SetCursor(50, 30);
+    int16ToString(motor_info[id].rotor_speed, buffer, 0);
+    ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(57, 40);
-		int16ToString(motor_info[id].torque_current, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+    ssd1306_SetCursor(57, 40);
+    int16ToString(motor_info[id].torque_current, buffer, 0);
+    ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(43, 50);
-		uint8ToString(motor_info[id].temperature, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+    ssd1306_SetCursor(43, 50);
+    uint8ToString(motor_info[id].temperature, buffer, 0);
+    ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_UpdateScreen(&hi2c2);
-	}
+    ssd1306_UpdateScreen(&hi2c2);
+  }
 
-	if (htim->Instance == TIM7) {
-		voltage += voltage_step;
-		if (voltage == 25000) {
-			voltage_step = 0;
-			voltage_count++;
-		} else if (voltage == -25000) {
-			voltage_step = 0;
-			voltage_count--;
-		}
+  if (htim->Instance == TIM7) {
+    voltage += voltage_step;
+    if (voltage == 25000) {
+      voltage_step = 0;
+      voltage_count++;
+    } else if (voltage == -25000) {
+      voltage_step = 0;
+      voltage_count--;
+    }
 
-		if (voltage_step == 0) {
-			if (voltage_count == 10000) {
-				voltage_step = -2;
-				voltage_count = 0;
-			} else if (voltage_count == -10000) {
-				voltage_step = 2;
-				voltage_count = 0;
-			}
-		}
-	}
+    if (voltage_step == 0) {
+      if (voltage_count == 10000) {
+        voltage_step = -2;
+        voltage_count = 0;
+      } else if (voltage_count == -10000) {
+        voltage_step = 2;
+        voltage_count = 0;
+      }
+    }
+  }
 }
 
 /* USER CODE END PFP */
