@@ -49,4 +49,3 @@ void MX_TIM6_Init(void);
 #endif
 
 #endif /* __TIM_H__ */
-

@@ -13,16 +13,16 @@
 
 // 电机信息结构体
 typedef struct {
-	// CAN ID
-	uint16_t can_id;
-	// 电机的转子角度
-	uint16_t rotor_angle;
-	// 电机的转子速度
-	int16_t rotor_speed;
-	// 电机的转矩电流
-	int16_t current;
-	// 电机的温度
-	uint8_t temperature;
+  // CAN ID
+  uint16_t can_id;
+  // 电机的转子角度
+  uint16_t rotor_angle;
+  // 电机的转子速度
+  int16_t rotor_speed;
+  // 电机的转矩电流
+  int16_t current;
+  // 电机的温度
+  uint8_t temperature;
 } motor_info_t;
 
 /**
@@ -34,7 +34,8 @@ typedef struct {
  * @param  v4 电机 4 的电压
  * @retval None
  */
-void set_motor_voltage(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3, int16_t v4);
+void set_motor_voltage(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3,
+                       int16_t v4);
 
 /**
  * @brief  解析电机反馈数据
@@ -43,7 +44,8 @@ void set_motor_voltage(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3, int
  * @param  motor_info 电机信息结构体
  * @retval 解析的电机 ID，-1 为不是电机反馈数据
  */
-int8_t parse_motor_feedback(CAN_RxHeaderTypeDef rx_header, uint8_t *rx_data, motor_info_t *motor_info);
+int8_t parse_motor_feedback(CAN_RxHeaderTypeDef rx_header, uint8_t *rx_data,
+                            motor_info_t *motor_info);
 
 /**
  * @brief  自定义 CAN 1 配置函数
