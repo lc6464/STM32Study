@@ -48,8 +48,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define MOTOR_RPM 50 // 电机转速
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -62,6 +60,10 @@ motor_info_t motor_info[MOTOR_MAX_NUM] = { 0 };
 // PID 控制器
 PIDController pid0 = { 0 };
 PIDController pid1 = { 0 };
+
+int16_t motor0_speed = -30;
+int16_t motor1_speed = 30;
+int8_t motor0_step = -1;
 
 /* USER CODE END PV */
 
@@ -84,7 +86,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 		float current_speed = (float)motor_info[result].rotor_speed;
 
 		// 使用 PID 控制器计算新的控制输出
-		PIDController_Update(result ? &pid1 : &pid0, result ? MOTOR_RPM : -MOTOR_RPM, current_speed);
+		PIDController_Update(result ? &pid1 : &pid0, result ? motor1_speed : motor0_speed, current_speed);
 
 		set_motor_voltage(0, (int16_t)pid0.out, (int16_t)pid1.out, 0, 0); // 设置电机电压
 	}
@@ -100,33 +102,33 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 		// 数据标签
 		ssd1306_SetCursor(0, 5);
-		ssd1306_WriteString("PID0 Out:", Font_7x10, White);
+		ssd1306_WriteString("PID 0:", Font_7x10, White);
 
 		ssd1306_SetCursor(0, 15);
-		ssd1306_WriteString("D Speed0:", Font_7x10, White);
+		ssd1306_WriteString("Speed 0:", Font_7x10, White);
 
 		ssd1306_SetCursor(0, 30);
-		ssd1306_WriteString("PID1 Out:", Font_7x10, White);
+		ssd1306_WriteString("PID 1:", Font_7x10, White);
 
 		ssd1306_SetCursor(0, 40);
-		ssd1306_WriteString("D Speed1:", Font_7x10, White);
+		ssd1306_WriteString("Speed 1:", Font_7x10, White);
 
 		// 电机 1 的 PID 输出和转速
-		ssd1306_SetCursor(68, 5);
+		ssd1306_SetCursor(60, 5);
 		int16ToString((int16_t)pid0.out, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(68, 15);
-		int16ToString(motor_info[0].rotor_speed + MOTOR_RPM, buffer, 0);
+		ssd1306_SetCursor(60, 15);
+		int16ToString(motor_info[0].rotor_speed, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
 		// 电机 2 的 PID 输出和转速
-		ssd1306_SetCursor(68, 30);
+		ssd1306_SetCursor(60, 30);
 		int16ToString((int16_t)pid1.out, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(68, 40);
-		int16ToString(motor_info[1].rotor_speed - MOTOR_RPM, buffer, 0);
+		ssd1306_SetCursor(60, 40);
+		int16ToString(motor_info[1].rotor_speed, buffer, 0);
 		ssd1306_WriteString(buffer, Font_7x10, White);
 
 		ssd1306_UpdateScreen(&hi2c2);
@@ -198,6 +200,18 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+
+		// 每 100ms 给电机 0 speed--，电机 1 speed++，到 -100/100 后保持 5s，随后反向加减，直到 100/-100
+		if (motor0_speed == 100 || motor0_speed == -100) {
+			motor0_step = -motor0_step;
+			HAL_Delay(8000);
+		}
+		if (motor0_speed == 0) {
+			HAL_Delay(5000);
+		}
+		motor0_speed += motor0_step;
+		motor1_speed = -motor0_speed;
+		HAL_Delay(100);
 	}
 	/* USER CODE END 3 */
 }

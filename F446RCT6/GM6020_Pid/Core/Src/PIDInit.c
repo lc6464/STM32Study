@@ -9,8 +9,8 @@ void LC_PID_Init(PIDController *pid) {
     pid->tau = 0.1f;
 
     // 设置输出限制
-    pid->limMin = -10000;
-    pid->limMax = 10000;
+    pid->limMin = -25000;
+    pid->limMax = 25000;
 
     // 设置积分限制
     pid->limMinInt = -50000;
