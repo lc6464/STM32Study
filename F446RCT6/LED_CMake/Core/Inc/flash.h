@@ -8,6 +8,5 @@
 
 void led_flash(GPIO_TypeDef *port, uint16_t pin, uint32_t delay);
 
-
-//void led_flash(GPIO_TypeDef *port, uint16_t pin, uint32_t delay);
-//void led_flash(GPIO_TypeDef *port, uint16_t pin);
+// void led_flash(GPIO_TypeDef *port, uint16_t pin, uint32_t delay);
+// void led_flash(GPIO_TypeDef *port, uint16_t pin);
