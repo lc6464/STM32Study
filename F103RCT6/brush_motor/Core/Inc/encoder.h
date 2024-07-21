@@ -4,13 +4,12 @@
 
 // 编码器结构体
 typedef struct {
-	TIM_HandleTypeDef *HTim; // 定时器句柄指针
-	int32_t LastCount;       // 上一次的计数值
-	int32_t OverflowCount;   // 溢出计数
-	uint32_t LastTime;       // 上次更新时间
-	float Speed;             // 计算得到的速度
+  TIM_HandleTypeDef *HTim; // 定时器句柄指针
+  int32_t LastCount;       // 上一次的计数值
+  int32_t OverflowCount;   // 溢出计数
+  uint32_t LastTime;       // 上次更新时间
+  float Speed;             // 计算得到的速度
 } Encoder;
-
 
 /**
  * @brief 初始化编码器
