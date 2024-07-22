@@ -27,6 +27,8 @@
 
 #include "motor.h"
 #include "encoder.h"
+#include "PID.h"
+#include "PIDInit.h"
 
 /* USER CODE END Includes */
 
@@ -51,9 +53,9 @@
 
 Motor motor = { 0 };
 Encoder encoder = { 0 };
+PIDController pid = { 0 };
 
-int16_t motor_speed = 10;
-int8_t motor_step = 1;
+int16_t motor_speed = 0;
 
 /* USER CODE END PV */
 
@@ -61,13 +63,18 @@ int8_t motor_step = 1;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-// TIM3 溢出更新
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	// 编码器定时器溢出更新
 	EncoderOverflowCallback(htim, &encoder);
 
 	if (htim->Instance == TIM6) {
-		// 100ms
+		// 100ms TIM6
+
 		Encoder_Update(&encoder);
+		PIDController_Update(&pid, (float)motor_speed, encoder.Speed);
+		Motor_SetSpeed(motor, (int16_t)pid.out);
+
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	}
 }
 
@@ -112,31 +119,28 @@ int main(void) {
 	MX_TIM6_Init();
 	/* USER CODE BEGIN 2 */
 
+	PIDController_Init(&pid);
+	LC_PID_Config(&pid);
+
 	Encoder_Init(&encoder, &htim3);
 
 	Motor_Init(&motor, &htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
 	Motor_Start(motor);
-	Motor_SetSpeed(motor, motor_speed);
 
 	HAL_TIM_Base_Start_IT(&htim6);
+
+	HAL_Delay(1000);
+	motor_speed = 150;
+	HAL_Delay(5000);
+	motor_speed = 300;
+	HAL_Delay(10000);
+	motor_speed = 200;
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		// 0 -> 500 | 1s |: 500 -> -500 | 1s | -500 -> 500 :|
-		if (motor_speed >= 500 || motor_speed <= -500) {
-			motor_step = -motor_step;
-			HAL_Delay(1000);
-		} else if (motor_speed == 0) {
-			HAL_Delay(10);
-		}
-
-		motor_speed += motor_step;
-		Motor_SetSpeed(motor, motor_speed);
-		HAL_Delay(10);
-
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -189,7 +193,7 @@ void SystemClock_Config(void) {
   */
 void Error_Handler(void) {
 	/* USER CODE BEGIN Error_Handler_Debug */
-		/* User can add his own implementation to report the HAL error return state */
+		  /* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
 	while (1) {
 	}
@@ -206,9 +210,9 @@ void Error_Handler(void) {
   */
 void assert_failed(uint8_t *file, uint32_t line) {
 	/* USER CODE BEGIN 6 */
-		/* User can add his own implementation to report the file name and line
-			 number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
-			 line) */
-			 /* USER CODE END 6 */
+		  /* User can add his own implementation to report the file name and line
+			   number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
+			   line) */
+			   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
