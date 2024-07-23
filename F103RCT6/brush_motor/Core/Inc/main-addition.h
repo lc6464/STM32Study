@@ -1,12 +1,11 @@
 #pragma once
 
+#include "PID.h"
 #include "community.h"
 #include "encoder.h"
 #include "motor.h"
-#include "PID.h"
 
 #include "main.h"
-
 
 bool MotorSpeed_SentCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData);
 
@@ -31,22 +30,21 @@ extern PIDController pid0;
 // 电机速度发送
 extern Community community;
 
-
 extern int16_t target_speed;
 extern int16_t round_speed;
 extern int8_t speed_step;
 
 extern uint8_t sent_times;
 
-
-inline bool MotorSpeed_SentCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
-	if (rxHeader->StdId == 0x001) {
-		// 如果接收到的是 ID 为 0x001 的一字节 0x00 数据
-		if (rxHeader->DLC == 1 && rxData[0] == 0x00) {
-			// OK
-			sent_times--;
-		}
-		return true;
-	}
-	return false;
+inline bool MotorSpeed_SentCallback(CAN_RxHeaderTypeDef *rxHeader,
+                                    uint8_t *rxData) {
+  if (rxHeader->StdId == 0x001) {
+    // 如果接收到的是 ID 为 0x001 的一字节 0x00 数据
+    if (rxHeader->DLC == 1 && rxData[0] == 0x00) {
+      // OK
+      sent_times--;
+    }
+    return true;
+  }
+  return false;
 }
