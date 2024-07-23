@@ -18,6 +18,7 @@
  /* USER CODE END Header */
  /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "can.h"
 #include "i2c.h"
 #include "tim.h"
 #include "gpio.h"
@@ -25,9 +26,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "motor.h"
-#include "encoder.h"
-#include "PID.h"
+#include "main-addition.h"
+
+// #include "main-addition.h"
 
 /* USER CODE END Includes */
 
@@ -52,61 +53,35 @@
 
 // 四个电机
 Motor motor0(&htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
-Motor motor1(&htim1, TIM_CHANNEL_1, TIM_CHANNEL_2);
-Motor motor2(&htim8, TIM_CHANNEL_3, TIM_CHANNEL_4);
-Motor motor3(&htim8, TIM_CHANNEL_2, TIM_CHANNEL_1);
+// Motor motor1(&htim1, TIM_CHANNEL_1, TIM_CHANNEL_2);
+// Motor motor2(&htim8, TIM_CHANNEL_3, TIM_CHANNEL_4);
+// Motor motor3(&htim8, TIM_CHANNEL_1, TIM_CHANNEL_2);
 
 // 四个编码器
 Encoder encoder0(&htim3);
-Encoder encoder1(&htim4);
-Encoder encoder2(&htim2);
-Encoder encoder3(&htim5);
+// Encoder encoder1(&htim4);
+// Encoder encoder2(&htim2);
+// Encoder encoder3(&htim5);
 
 // 四个 PID
-PIDController pid0(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
-PIDController pid1(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
-PIDController pid2(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
-PIDController pid3(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+PIDController pid0(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+// PIDController pid1(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+// PIDController pid2(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+// PIDController pid3(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+
+// 电机速度发送
+Community community(&hcan, MotorSpeed_SentCallback);
 
 int16_t target_speed = 0;
 int16_t round_speed = 0;
 int8_t speed_step = 1;
 
+uint8_t sent_times = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	// 编码器定时器溢出更新
-	encoder0.OverflowCallback(htim);
-	encoder1.OverflowCallback(htim);
-	encoder2.OverflowCallback(htim);
-	encoder3.OverflowCallback(htim);
-
-	if (htim->Instance == TIM6) {
-		// 100ms TIM6
-
-		encoder0.Update();
-		float result0 = pid0.Update((float)(round_speed + target_speed), encoder0.GetSpeed());
-		motor0.SetSpeed(static_cast<int16_t>(result0));
-
-		encoder1.Update();
-		float result1 = pid1.Update((float)(round_speed + target_speed), encoder1.GetSpeed());
-		motor1.SetSpeed(static_cast<int16_t>(result1));
-
-		encoder2.Update();
-		float result2 = pid2.Update((float)(round_speed - target_speed), encoder2.GetSpeed());
-		motor2.SetSpeed(static_cast<int16_t>(result2));
-
-		encoder3.Update();
-		float result3 = pid3.Update((float)(-round_speed + target_speed), encoder3.GetSpeed());
-		motor3.SetSpeed(static_cast<int16_t>(result3));
-
-		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	}
-}
 
 /* USER CODE END PFP */
 
@@ -143,25 +118,28 @@ int main(void) {
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	MX_CAN_Init();
 	MX_TIM1_Init();
-	MX_TIM3_Init();
-	MX_I2C2_Init();
-	MX_TIM6_Init();
 	MX_TIM2_Init();
+	MX_TIM3_Init();
 	MX_TIM4_Init();
 	MX_TIM5_Init();
+	MX_TIM6_Init();
 	MX_TIM8_Init();
+	MX_I2C2_Init();
 	/* USER CODE BEGIN 2 */
 
+	community.Start();
+
 	encoder0.Start();
-	encoder1.Start();
-	encoder2.Start();
-	encoder3.Start();
+	// encoder1.Start();
+	// encoder2.Start();
+	// encoder3.Start();
 
 	motor0.Start();
-	motor1.Start();
-	motor2.Start();
-	motor3.Start();
+	// motor1.Start();
+	// motor2.Start();
+	// motor3.Start();
 
 	HAL_TIM_Base_Start_IT(&htim6);
 

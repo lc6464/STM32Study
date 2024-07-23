@@ -28,19 +28,21 @@ public:
 	/**
 	 * @brief 更新编码器数据
 	 * @note 定时调用，如在 HAL_TIM_PeriodElapsedCallback 函数中调用
+	 * @return 当前速度
 	 */
-	void Update();
+	float Update();
 
 	/**
 	 * @brief 编码器溢出回调函数
 	 * @param htim 中断的定时器句柄指针
+	 * @return 是否溢出
 	 * @note 在 HAL_TIM_PeriodElapsedCallback 函数中无条件调用
 	 */
-	void OverflowCallback(const TIM_HandleTypeDef *htim);
+	bool OverflowCallback(const TIM_HandleTypeDef *htim);
 
 	/**
 	 * @brief 获取当前速度
-	 * @return 当前速度值
+	 * @return 当前速度
 	 */
 	float GetSpeed() const { return _speed; }
 

@@ -42,8 +42,9 @@ HAL_StatusTypeDef Encoder::Stop() {
 /**
  * @brief 更新编码器数据
  * @note 定时调用，如在 HAL_TIM_PeriodElapsedCallback 函数中调用
+ * @return 当前速度
  */
-void Encoder::Update() {
+float Encoder::Update() {
 	// 读取当前计数值和时间
 	uint16_t currentCount = __HAL_TIM_GET_COUNTER(_htim);
 	uint32_t currentTime = HAL_GetTick();
@@ -76,7 +77,7 @@ void Encoder::Update() {
 				__HAL_TIM_SET_COUNTER(_htim, 0);
 			}
 		}
-		return;
+		return 0;
 	}
 
 	// 处理停止状态
@@ -88,14 +89,17 @@ void Encoder::Update() {
 
 	// 应用低通滤波
 	_speed = _speed * (1.0f - FILTER_ALPHA) + rawSpeed * FILTER_ALPHA;
+
+	return _speed;
 }
 
 /**
  * @brief 编码器溢出回调函数
  * @param htim 定时器句柄指针
+ * @return 是否溢出
  * @note 在 HAL_TIM_PeriodElapsedCallback 函数中无条件调用
  */
-void Encoder::OverflowCallback(const TIM_HandleTypeDef *htim) {
+bool Encoder::OverflowCallback(const TIM_HandleTypeDef *htim) {
 	assert_param(htim != nullptr);
 
 	// 如果是当前编码器的定时器
@@ -106,5 +110,8 @@ void Encoder::OverflowCallback(const TIM_HandleTypeDef *htim) {
 		} else {
 			_overflowCount++;  // 向上计数时溢出
 		}
+		return true;
 	}
+
+	return false;
 }
