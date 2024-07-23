@@ -50,13 +50,27 @@
 
 /* USER CODE BEGIN PV */
 
-Motor motor(&htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
-Encoder encoder(&htim3);
-PIDController pid(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+// 四个电机
+Motor motor0(&htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
+Motor motor1(&htim1, TIM_CHANNEL_1, TIM_CHANNEL_2);
+Motor motor2(&htim8, TIM_CHANNEL_3, TIM_CHANNEL_4);
+Motor motor3(&htim8, TIM_CHANNEL_2, TIM_CHANNEL_1);
+
+// 四个编码器
+Encoder encoder0(&htim3);
+Encoder encoder1(&htim4);
+Encoder encoder2(&htim2);
+Encoder encoder3(&htim5);
+
+// 四个 PID
+PIDController pid0(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+PIDController pid1(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+PIDController pid2(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+PIDController pid3(-1.0f, -2.0f, -0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
 
 int16_t target_speed = 0;
+int16_t round_speed = 0;
 int8_t speed_step = 1;
-
 
 /* USER CODE END PV */
 
@@ -66,14 +80,29 @@ void SystemClock_Config(void);
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	// 编码器定时器溢出更新
-	encoder.OverflowCallback(htim);
+	encoder0.OverflowCallback(htim);
+	encoder1.OverflowCallback(htim);
+	encoder2.OverflowCallback(htim);
+	encoder3.OverflowCallback(htim);
 
 	if (htim->Instance == TIM6) {
 		// 100ms TIM6
 
-		encoder.Update();
-		float result = pid.Update((float)target_speed, encoder.GetSpeed());
-		motor.SetSpeed(static_cast<int16_t>(result));
+		encoder0.Update();
+		float result0 = pid0.Update((float)(round_speed + target_speed), encoder0.GetSpeed());
+		motor0.SetSpeed(static_cast<int16_t>(result0));
+
+		encoder1.Update();
+		float result1 = pid1.Update((float)(round_speed + target_speed), encoder1.GetSpeed());
+		motor1.SetSpeed(static_cast<int16_t>(result1));
+
+		encoder2.Update();
+		float result2 = pid2.Update((float)(round_speed - target_speed), encoder2.GetSpeed());
+		motor2.SetSpeed(static_cast<int16_t>(result2));
+
+		encoder3.Update();
+		float result3 = pid3.Update((float)(-round_speed + target_speed), encoder3.GetSpeed());
+		motor3.SetSpeed(static_cast<int16_t>(result3));
 
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	}
@@ -118,11 +147,21 @@ int main(void) {
 	MX_TIM3_Init();
 	MX_I2C2_Init();
 	MX_TIM6_Init();
+	MX_TIM2_Init();
+	MX_TIM4_Init();
+	MX_TIM5_Init();
+	MX_TIM8_Init();
 	/* USER CODE BEGIN 2 */
 
-	encoder.Start();
+	encoder0.Start();
+	encoder1.Start();
+	encoder2.Start();
+	encoder3.Start();
 
-	motor.Start();
+	motor0.Start();
+	motor1.Start();
+	motor2.Start();
+	motor3.Start();
 
 	HAL_TIM_Base_Start_IT(&htim6);
 
@@ -131,14 +170,16 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		// 电机速度：400 -> -400 | 3s | -400 -> 400 | 3s
-		if (target_speed >= 400 || target_speed <= -400) {
+		// 电机速度：300 -> -300 | 3s | -300 -> 300 | 3s
+		if (target_speed >= 250 || target_speed <= -250) {
 			speed_step = -speed_step;
 			HAL_Delay(3000);
 		}
 
-		target_speed += speed_step;
-		HAL_Delay(10);
+		target_speed += speed_step << 1;
+		round_speed += speed_step;
+		HAL_Delay(50);
+
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
