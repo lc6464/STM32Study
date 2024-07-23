@@ -28,7 +28,6 @@
 #include "motor.h"
 #include "encoder.h"
 #include "PID.h"
-#include "PIDInit.h"
 
 /* USER CODE END Includes */
 
@@ -51,11 +50,13 @@
 
 /* USER CODE BEGIN PV */
 
-Motor motor = { 0 };
-Encoder encoder = { 0 };
-PIDController pid = { 0 };
+Motor motor(&htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
+Encoder encoder(&htim3);
+PIDController pid(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
 
-int16_t motor_speed = 0;
+int16_t target_speed = 0;
+int8_t speed_step = 1;
+
 
 /* USER CODE END PV */
 
@@ -65,14 +66,14 @@ void SystemClock_Config(void);
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	// 编码器定时器溢出更新
-	EncoderOverflowCallback(htim, &encoder);
+	encoder.OverflowCallback(htim);
 
 	if (htim->Instance == TIM6) {
 		// 100ms TIM6
 
-		Encoder_Update(&encoder);
-		PIDController_Update(&pid, (float)motor_speed, encoder.Speed);
-		Motor_SetSpeed(motor, (int16_t)pid.out);
+		encoder.Update();
+		float result = pid.Update((float)target_speed, encoder.GetSpeed());
+		motor.SetSpeed(static_cast<int16_t>(result));
 
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	}
@@ -119,28 +120,25 @@ int main(void) {
 	MX_TIM6_Init();
 	/* USER CODE BEGIN 2 */
 
-	PIDController_Init(&pid);
-	LC_PID_Config(&pid);
+	encoder.Start();
 
-	Encoder_Init(&encoder, &htim3);
-
-	Motor_Init(&motor, &htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
-	Motor_Start(motor);
+	motor.Start();
 
 	HAL_TIM_Base_Start_IT(&htim6);
-
-	HAL_Delay(1000);
-	motor_speed = 150;
-	HAL_Delay(5000);
-	motor_speed = 300;
-	HAL_Delay(10000);
-	motor_speed = 200;
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		// 电机速度：400 -> -400 | 3s | -400 -> 400 | 3s
+		if (target_speed >= 400 || target_speed <= -400) {
+			speed_step = -speed_step;
+			HAL_Delay(3000);
+		}
+
+		target_speed += speed_step;
+		HAL_Delay(10);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -153,8 +151,14 @@ int main(void) {
   * @retval None
   */
 void SystemClock_Config(void) {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers" // 这段代码由 CubeMX 自动生成，不做出修改
+
 	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+
+#pragma GCC diagnostic pop
 
 	/** Initializes the RCC Oscillators according to the specified parameters
 	* in the RCC_OscInitTypeDef structure.
