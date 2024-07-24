@@ -33,7 +33,7 @@ extern Community community;
 
 
 extern int16_t target_speed;
-extern int16_t round_speed;
+//extern int16_t round_speed;
 extern int8_t speed_step;
 
 extern uint8_t sent_times;

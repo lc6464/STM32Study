@@ -64,7 +64,7 @@ Encoder encoder0(&htim3);
 // Encoder encoder3(&htim5);
 
 // 四个 PID
-PIDController pid0(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
+PIDController pid0(1.5f, 6.0f, 0.3f, 0.2f, -1000, 1000, -2000, 2000, 0.1f);
 // PIDController pid1(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
 // PIDController pid2(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
 // PIDController pid3(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
@@ -72,8 +72,8 @@ PIDController pid0(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
 // 电机速度发送
 Community community(&hcan, MotorSpeed_SentCallback);
 
-int16_t target_speed = 0;
-int16_t round_speed = 0;
+int16_t target_speed = 120;
+//int16_t round_speed = 0;
 int8_t speed_step = 1;
 
 uint8_t sent_times = 0;
@@ -149,14 +149,19 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 		// 电机速度：300 -> -300 | 3s | -300 -> 300 | 3s
-		if (target_speed >= 250 || target_speed <= -250) {
+		/*if (target_speed >= 300 || target_speed <= -300) {
 			speed_step = -speed_step;
 			HAL_Delay(3000);
 		}
 
-		target_speed += speed_step << 1;
-		round_speed += speed_step;
-		HAL_Delay(50);
+		target_speed += speed_step;
+		//round_speed += speed_step;
+		HAL_Delay(50);*/
+
+		target_speed = 100;
+		HAL_Delay(15000);
+		target_speed = 0;
+		HAL_Delay(15000);
 
 		/* USER CODE END WHILE */
 

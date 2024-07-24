@@ -3,7 +3,7 @@
 void Community::Start() {
 	CAN_FilterTypeDef filterConfig;
 
-	filterConfig.FilterBank = 0;
+	filterConfig.FilterBank = 14;
 	filterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	filterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
 	filterConfig.FilterIdHigh = 0;
@@ -31,7 +31,7 @@ HAL_StatusTypeDef Community::Transmit(CAN_TxHeaderTypeDef *txHeader, uint8_t *tx
 	return HAL_CAN_AddTxMessage(_hcan, txHeader, txData, mailbox);
 }
 
-HAL_StatusTypeDef Community::SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t pidOut) {
+HAL_StatusTypeDef Community::SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t round, int16_t pidOut) {
 	CAN_TxHeaderTypeDef txHeader;
 	uint8_t txData[8];
 
@@ -45,8 +45,10 @@ HAL_StatusTypeDef Community::SendMotorSpeed(uint16_t canId, uint32_t *mailbox, i
 	txData[1] = static_cast<uint8_t>(speed >> 8);
 	txData[2] = static_cast<uint8_t>(target);
 	txData[3] = static_cast<uint8_t>(target >> 8);
-	txData[4] = static_cast<uint8_t>(pidOut);
-	txData[5] = static_cast<uint8_t>(pidOut >> 8);
+	txData[4] = static_cast<uint8_t>(round);
+	txData[5] = static_cast<uint8_t>(round >> 8);
+	txData[6] = static_cast<uint8_t>(pidOut);
+	txData[7] = static_cast<uint8_t>(pidOut >> 8);
 
 	return Transmit(&txHeader, txData, mailbox);
 }

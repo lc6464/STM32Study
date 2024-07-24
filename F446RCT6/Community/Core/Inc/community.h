@@ -60,11 +60,12 @@ public:
 	 * @param canId CAN ID
 	 * @param mailbox 发送邮箱
 	 * @param speed 取整的实时速度
-	 * @param target 目标速度
+	 * @param target 目标速度直线分量
+	 * @param round 目标速度旋转分量
 	 * @param pidOut 取整的 PID 输出控制量
 	 * @return 发送状态
 	 */
-	HAL_StatusTypeDef SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t pidOut);
+	HAL_StatusTypeDef SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t round, int16_t pidOut);
 
 	/**
 	 * @brief 执行接收回调函数

@@ -1,3 +1,4 @@
+#include "mailboxes.h"
 #include "main-addition.h"
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
@@ -9,7 +10,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// float speed2 = encoder2.Update();
 		// float speed3 = encoder3.Update();
 
-		float result0 = pid0.Update(static_cast<float>(round_speed + target_speed), speed0);
+		float result0 = pid0.Update(static_cast<float>(/*round_speed + */target_speed), speed0);
 		// float result1 = pid1.Update(static_cast<float>(round_speed + target_speed), speed1);
 		// float result2 = pid2.Update(static_cast<float>(round_speed - target_speed), speed2);
 		// float result3 = pid3.Update(static_cast<float>(-round_speed + target_speed), speed3);
@@ -21,9 +22,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 
 		// 发送电机速度
-		/// @bug 发四次就炸了！！！
-		auto sent_result = community.SendMotorSpeed(0x000, static_cast<int16_t>(speed0), target_speed, round_speed, static_cast<int16_t>(result0));
-
+		auto mailbox = Mailboxes::Create();
+		auto sent_result = community.SendMotorSpeed(0x000, mailbox, static_cast<int16_t>(speed0), target_speed, static_cast<int16_t>(result0));
 
 		if (sent_result != HAL_OK) {
 			// 发送失败，灯灭

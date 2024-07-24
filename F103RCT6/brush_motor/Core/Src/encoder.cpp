@@ -6,7 +6,8 @@
  */
 Encoder::Encoder(TIM_HandleTypeDef *htim)
 	: _htim(htim), _lastCount(0), _overflowCount(0), _lastTime(0),
-	_speed(0), _isStopped(false), _lastUpdateTime(0) {
+	_isStopped(false), _lastUpdateTime(0), _encoderDiff(0),
+	_motorRPM(0), _outputRPM(0) {
 	assert_param(htim != nullptr);
 }
 
@@ -21,7 +22,10 @@ HAL_StatusTypeDef Encoder::Start() {
 
 	_lastCount = 0;
 	_overflowCount = 0;
-	_speed = 0;
+	_encoderDiff = 0;
+	_motorRPM = 0;
+	_outputRPM = 0;
+
 	_isStopped = false;
 	_lastTime = HAL_GetTick();
 	_lastUpdateTime = _lastTime;
@@ -42,7 +46,7 @@ HAL_StatusTypeDef Encoder::Stop() {
 /**
  * @brief 更新编码器数据
  * @note 定时调用，如在 HAL_TIM_PeriodElapsedCallback 函数中调用
- * @return 当前速度
+ * @return 当前输出速度
  */
 float Encoder::Update() {
 	// 读取当前计数值和时间
@@ -57,6 +61,9 @@ float Encoder::Update() {
 	diff += static_cast<int32_t>(_overflowCount) * static_cast<int32_t>(_htim->Instance->ARR + 1);
 	_overflowCount = 0;
 
+	// 计算时间间隔（分钟）
+	float timeDiffInMinutes = (currentTime - _lastTime) / (1000.0f * 60.0f);
+
 	// 更新最后一次的计数和时间
 	_lastCount = currentCount;
 	_lastTime = currentTime;
@@ -70,7 +77,10 @@ float Encoder::Update() {
 			if (timeSinceLastUpdate >= 200) {
 				_lastCount = 0;
 				_overflowCount = 0;
-				_speed = 0;
+				_encoderDiff = 0;
+				_motorRPM = 0;
+				_outputRPM = 0;
+
 				_isStopped = true;
 
 				// 重置编码器定时器
@@ -85,12 +95,18 @@ float Encoder::Update() {
 	_lastUpdateTime = currentTime;
 
 	// 计算速度（这里直接使用diff作为原始速度）
-	float rawSpeed = static_cast<float>(diff);
+	float rawEncoderDiff = static_cast<float>(diff);
 
 	// 应用低通滤波
-	_speed = _speed * (1.0f - FILTER_ALPHA) + rawSpeed * FILTER_ALPHA;
+	_encoderDiff = _encoderDiff * (1.0f - FILTER_ALPHA) + rawEncoderDiff * FILTER_ALPHA;
 
-	return _speed;
+	// 计算电机转速（rpm）
+	_motorRPM = (_encoderDiff / PULSES_PER_REVOLUTION) / timeDiffInMinutes;
+
+	// 计算输出转速（rpm）
+	_outputRPM = _motorRPM / GEAR_RATIO;
+
+	return _outputRPM;
 }
 
 /**
