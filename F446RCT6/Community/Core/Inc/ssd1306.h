@@ -19,7 +19,7 @@
 #include "fonts.h"
 #include "stm32f4xx_hal.h"
 
- // I2c address
+// I2c address
 #ifndef SSD1306_I2C_ADDR
 #define SSD1306_I2C_ADDR 0x78
 #endif // SSD1306_I2C_ADDR
@@ -46,18 +46,18 @@
 //  Enumeration for screen colors
 //
 typedef enum {
-	Black = 0x00, // Black color, no pixel
-	White = 0x01, // Pixel is set. Color depends on LCD
+  Black = 0x00, // Black color, no pixel
+  White = 0x01, // Pixel is set. Color depends on LCD
 } SSD1306_COLOR;
 
 //
 //  Struct to store transformations
 //
 typedef struct {
-	uint16_t CurrentX;
-	uint16_t CurrentY;
-	uint8_t Inverted;
-	uint8_t Initialized;
+  uint16_t CurrentX;
+  uint16_t CurrentY;
+  uint8_t Inverted;
+  uint8_t Initialized;
 } SSD1306_t;
 
 //
@@ -68,16 +68,16 @@ typedef struct {
 extern "C" {
 #endif
 
-	uint8_t ssd1306_Init(I2C_HandleTypeDef *hi2c);
-	void ssd1306_UpdateScreen(I2C_HandleTypeDef *hi2c);
-	void ssd1306_Fill(SSD1306_COLOR color);
-	void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);
-	char ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color);
-	char ssd1306_WriteString(const char *str, FontDef Font, SSD1306_COLOR color);
-	void ssd1306_SetCursor(uint8_t x, uint8_t y);
-	void ssd1306_InvertColors(void);
+uint8_t ssd1306_Init(I2C_HandleTypeDef *hi2c);
+void ssd1306_UpdateScreen(I2C_HandleTypeDef *hi2c);
+void ssd1306_Fill(SSD1306_COLOR color);
+void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);
+char ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color);
+char ssd1306_WriteString(const char *str, FontDef Font, SSD1306_COLOR color);
+void ssd1306_SetCursor(uint8_t x, uint8_t y);
+void ssd1306_InvertColors(void);
 
-	extern uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
+extern uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 
 #ifdef __cplusplus
 }
