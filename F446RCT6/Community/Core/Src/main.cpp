@@ -101,8 +101,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
-	if (rxHeader->StdId == 0x000 && rxHeader->DLC == 6) {
-		// 如果接收到的是 ID 为 0x000 的 6 字节数据
+	if (rxHeader->StdId == 0x1f0 && rxHeader->DLC == 6) {
+		// 如果接收到的是 ID 为 0x1f0 的 6 字节数据
 		/*
 			txData[0] = static_cast<uint8_t>(speed);
 			txData[1] = static_cast<uint8_t>(speed >> 8);
@@ -122,8 +122,9 @@ inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *
 	return false;
 }
 
-// 电机速度发送
-Community community(&hcan2, MotorSpeed_ReceivedCallback);
+// 电机速度接收
+Community community0(&hcan1, MotorSpeed_ReceivedCallback);
+Community community1(&hcan2, MotorSpeed_ReceivedCallback);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 	CAN_RxHeaderTypeDef rx_header;
@@ -131,7 +132,21 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data); // 接收数据
 
-	if (community.ExecuteRxCallback(&rx_header, rx_data)) {
+	if (community1.ExecuteRxCallback(&rx_header, rx_data)) {
+		// 对 0x200 发送 0x00
+		CAN_TxHeaderTypeDef tx_header;
+		uint8_t tx_data[1] = { 0 };
+
+		tx_header.StdId = 0x200;
+		tx_header.IDE = CAN_ID_STD;
+		tx_header.RTR = CAN_RTR_DATA;
+		tx_header.DLC = 1;
+		tx_header.TransmitGlobalTime = DISABLE;
+
+		uint32_t mailbox;
+
+		community1.Transmit(&tx_header, tx_data, &mailbox);
+
 		return;
 	}
 }
@@ -177,7 +192,22 @@ int main(void) {
 	MX_TIM6_Init();
 	/* USER CODE BEGIN 2 */
 
-	community.Start();
+	community0.Start();
+
+	CAN_FilterTypeDef filterConfig;
+
+	filterConfig.FilterBank = 14;
+	filterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	filterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	filterConfig.FilterIdHigh = 0;
+	filterConfig.FilterIdLow = 0;
+	filterConfig.FilterMaskIdHigh = 0;
+	filterConfig.FilterMaskIdLow = 0;
+	filterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+	filterConfig.FilterActivation = ENABLE;
+	filterConfig.SlaveStartFilterBank = 14;
+
+	community1.Start(&filterConfig);
 
 	ssd1306_Init(&hi2c2);
 

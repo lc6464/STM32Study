@@ -40,8 +40,8 @@ extern uint8_t sent_times;
 
 
 inline bool MotorSpeed_SentCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
-	if (rxHeader->StdId == 0x001) {
-		// 如果接收到的是 ID 为 0x001 的一字节 0x00 数据
+	if (rxHeader->StdId == 0x200) {
+		// 如果接收到的是 ID 为 0x200 的一字节 0x00 数据
 		if (rxHeader->DLC == 1 && rxData[0] == 0x00) {
 			// OK
 			sent_times--;

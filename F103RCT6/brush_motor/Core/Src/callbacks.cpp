@@ -20,10 +20,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// motor2.SetSpeed(static_cast<int16_t>(result2));
 		// motor3.SetSpeed(static_cast<int16_t>(result3));
 
-
 		// 发送电机速度
 		auto mailbox = Mailboxes::Create();
-		auto sent_result = community.SendMotorSpeed(0x000, mailbox, static_cast<int16_t>(speed0), target_speed, static_cast<int16_t>(result0));
+		auto sent_result = community.SendMotorSpeed(0x1f0, mailbox, static_cast<int16_t>(speed0), target_speed, static_cast<int16_t>(result0));
 
 		if (sent_result != HAL_OK) {
 			// 发送失败，灯灭
@@ -39,7 +38,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		sent_times++;
 
 		return;
-	}
+	}            
 
 	// 编码器定时器溢出更新
 	if (encoder0.OverflowCallback(htim)) {

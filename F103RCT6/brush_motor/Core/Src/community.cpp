@@ -33,12 +33,12 @@ HAL_StatusTypeDef Community::Transmit(CAN_TxHeaderTypeDef *txHeader, uint8_t *tx
 
 HAL_StatusTypeDef Community::SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t pidOut) {
 	CAN_TxHeaderTypeDef txHeader;
-	uint8_t txData[8];
+	uint8_t txData[6];
 
 	txHeader.StdId = canId;
 	txHeader.IDE = CAN_ID_STD;
 	txHeader.RTR = CAN_RTR_DATA;
-	txHeader.DLC = 8;
+	txHeader.DLC = 6;
 	txHeader.TransmitGlobalTime = DISABLE;
 
 	txData[0] = static_cast<uint8_t>(speed);
