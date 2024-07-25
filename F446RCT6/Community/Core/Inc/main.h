@@ -56,6 +56,8 @@ void Error_Handler(void);
 
 void SystemClock_Config(void);
 
+void HAL_UART_IDLE_Callback(UART_HandleTypeDef *huart);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

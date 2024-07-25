@@ -19,15 +19,18 @@
 	/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "can.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "gpio.h"
+#include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 #include "community.h"
 #include "fonts.h"
+#include "RemoteControl.h"
 #include "ssd1306.h"
 #include "strings.h"
 
@@ -56,49 +59,104 @@ int16_t speed = 0;
 int16_t target = 0;
 int16_t pidOut = 0;
 
+uint8_t screenScaler = 0;
+
+RemoteControl remoteControl(&huart5);
+RemoteControl::ControllerData controllerData; // 扔到全局方便调试
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM6) {
-		constexpr uint8_t id = 0;
+	if (htim->Instance == TIM6) { // 100ms
+		// RC Watchdog
+		//remoteControl.WatchDog();
 
-		char buffer[64] = { 0 };
+		// 每 300ms 刷新一次屏幕
+		if (++screenScaler == 3) {
+			screenScaler = 0;
 
-		ssd1306_Fill(Black);
+			char buffer[64] = { 0 };
 
-		// 展示电机信息
-		ssd1306_SetCursor(0, 0);
-		ssd1306_WriteString("Motor  Info", Font_11x18, White);
+			ssd1306_Fill(Black);
 
-		ssd1306_SetCursor(0, 20);
-		ssd1306_WriteString("Target:", Font_7x10, White);
-		ssd1306_SetCursor(0, 30);
-		ssd1306_WriteString("Speed:", Font_7x10, White);
-		ssd1306_SetCursor(0, 40);
-		ssd1306_WriteString("PID Out:", Font_7x10, White);
+			// 展示遥控器信息
+			ssd1306_SetCursor(25, 0);
+			ssd1306_WriteString("RC Info", Font_11x18, White);
 
-		// 写电机 ID
-		ssd1306_SetCursor(58, 0);
-		ssd1306_WriteChar('1' + id, Font_11x18, White);
+			if (remoteControl.GetStatus() != RemoteControl::Status::Running) {
+				ssd1306_SetCursor(0, 20);
+				ssd1306_WriteString("ERROR", Font_11x18, White);
+			} else {
+				ssd1306_SetCursor(0, 20);
+				ssd1306_WriteString("S L:", Font_7x10, White);
+				ssd1306_SetCursor(0, 30);
+				ssd1306_WriteString("S R:", Font_7x10, White);
+				ssd1306_SetCursor(0, 40);
+				ssd1306_WriteString("3PS:", Font_7x10, White);
+				ssd1306_SetCursor(0, 50);
+				ssd1306_WriteString("Dial:", Font_7x10, White);
 
-		ssd1306_SetCursor(50, 20);
-		int16ToString(target, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+				// Stick L: X,Y
+				ssd1306_SetCursor(40, 20);
+				auto length = int16ToString(controllerData.LeftStickX, buffer, 0);
+				buffer[length++] = ',';
+				int16ToString(controllerData.LeftStickY, buffer + length, 0);
+				ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(50, 30);
-		int16ToString(speed, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+				// Stick R: X,Y
+				ssd1306_SetCursor(40, 30);
+				length = int16ToString(controllerData.RightStickX, buffer, 0);
+				buffer[length++] = ',';
+				int16ToString(controllerData.RightStickY, buffer + length, 0);
+				ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_SetCursor(57, 40);
-		int16ToString(pidOut, buffer, 0);
-		ssd1306_WriteString(buffer, Font_7x10, White);
+				// 3PS: L,R
+				ssd1306_SetCursor(40, 40);
+				length = uint8ToString(static_cast<uint8_t>(controllerData.LeftSwitch), buffer, 0);
+				buffer[length++] = ',';
+				int16ToString(static_cast<uint8_t>(controllerData.RightSwitch), buffer + length, 0);
+				ssd1306_WriteString(buffer, Font_7x10, White);
 
-		ssd1306_UpdateScreen(&hi2c2);
+				// Dial: D
+				ssd1306_SetCursor(40, 50);
+				int16ToString(controllerData.Dial, buffer, 0);
+				ssd1306_WriteString(buffer, Font_7x10, White);
+			}
+
+			ssd1306_UpdateScreen(&hi2c2);
+		}
 	}
 }
+
+// 串口空闲中断回调
+void HAL_UART_IDLE_Callback(UART_HandleTypeDef *huart) {
+	if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE)) {
+
+		// 判断是否空闲中断
+		uint32_t data_length = 18 - __HAL_DMA_GET_COUNTER(huart->hdmarx);
+		if (remoteControl.RxCallback(huart)) {
+			// 如果接收成功
+			remoteControl >> controllerData;
+
+
+			return;
+		}
+		__HAL_UART_CLEAR_IDLEFLAG(huart); // 清除串口空闲中断标志位
+	}
+}
+
+// 串口 DMA 接收完成回调
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	if (remoteControl.RxCallback(huart)) {
+		// 如果接收成功
+		remoteControl >> controllerData;
+		return;
+	}
+}
+
 
 inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
 	if (rxHeader->StdId == 0x1f0 && rxHeader->DLC == 6) {
@@ -186,11 +244,15 @@ int main(void) {
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	MX_DMA_Init();
 	MX_CAN1_Init();
 	MX_CAN2_Init();
 	MX_I2C2_Init();
 	MX_TIM6_Init();
+	MX_UART5_Init();
 	/* USER CODE BEGIN 2 */
+
+	remoteControl.Start();
 
 	community0.Start();
 

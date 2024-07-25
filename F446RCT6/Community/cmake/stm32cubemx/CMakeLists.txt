@@ -24,8 +24,10 @@ target_sources(stm32cubemx INTERFACE
     # ../../Core/Src/main.c
     # ../../Core/Src/gpio.c
     # ../../Core/Src/can.c
+    # ../../Core/Src/dma.c
     # ../../Core/Src/i2c.c
     # ../../Core/Src/tim.c
+    # ../../Core/Src/usart.c
     # ../../Core/Src/stm32f4xx_it.c
     # ../../Core/Src/stm32f4xx_hal_msp.c
     C:/Users/LC/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c
@@ -46,6 +48,7 @@ target_sources(stm32cubemx INTERFACE
     C:/Users/LC/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c
     C:/Users/LC/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
     C:/Users/LC/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
+    C:/Users/LC/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
     # ../../Core/Src/system_stm32f4xx.c
     # ../../Core/Src/sysmem.c
     # ../../Core/Src/syscalls.c
