@@ -31,24 +31,24 @@ HAL_StatusTypeDef Community::Transmit(CAN_TxHeaderTypeDef *txHeader, uint8_t *tx
 	return HAL_CAN_AddTxMessage(_hcan, txHeader, txData, mailbox);
 }
 
-HAL_StatusTypeDef Community::SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t pidOut) {
+HAL_StatusTypeDef Community::SendSpeed(uint16_t canId, uint32_t *mailbox, float left, float right) {
 	CAN_TxHeaderTypeDef txHeader = {
 		.StdId = canId,
 		.ExtId = 0,
 		.IDE = CAN_ID_STD,
 		.RTR = CAN_RTR_DATA,
-		.DLC = 6,
+		.DLC = 8,
 		.TransmitGlobalTime = DISABLE
 	};
 
-	uint8_t txData[6] = {
-		static_cast<uint8_t>(speed),
-		static_cast<uint8_t>(speed >> 8),
-		static_cast<uint8_t>(target),
-		static_cast<uint8_t>(target >> 8),
-		static_cast<uint8_t>(pidOut),
-		static_cast<uint8_t>(pidOut >> 8)
-	};
+	/*
+		leftSpeed = *reinterpret_cast<float *>(rxData);
+		rightSpeed = *reinterpret_cast<float *>(rxData + 4);
+	*/
+
+	uint8_t txData[8] = { 0 };
+	*reinterpret_cast<float *>(txData) = left;
+	*reinterpret_cast<float *>(txData + 4) = right;
 
 	return Transmit(&txHeader, txData, mailbox);
 }

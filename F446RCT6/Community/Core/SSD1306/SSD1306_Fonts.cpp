@@ -1,6 +1,15 @@
 #include "SSD1306_Fonts.h"
 
-static const uint16_t Font7x10[] = {
+
+// 字体对象定义
+const SSD1306Font SSD1306Fonts::Font_7x10(7, 10, SSD1306Fonts::Font7x10);
+const SSD1306Font SSD1306Fonts::Font_11x18(11, 18, SSD1306Fonts::Font11x18);
+const SSD1306Font SSD1306Fonts::Font_16x26(16, 26, SSD1306Fonts::Font16x26);
+
+
+
+// 字体数据定义
+const uint16_t SSD1306Fonts::Font7x10[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // sp
 	0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
@@ -193,7 +202,7 @@ static const uint16_t Font7x10[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // ~
 };
 
-static const uint16_t Font11x18[] = {
+const uint16_t SSD1306Fonts::Font11x18[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // sp
@@ -481,7 +490,7 @@ static const uint16_t Font11x18[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // ~
 };
 
-static const uint16_t Font16x26[] = {
+const uint16_t SSD1306Fonts::Font16x26[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -863,7 +872,3 @@ static const uint16_t Font16x26[] = {
 	0xF1FF, 0xF07E, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // Ascii = [~]
 };
-
-SSD1306_Fonts SSD1306Font_7x10 = { 7, 10, Font7x10 };
-SSD1306_Fonts SSD1306Font_11x18 = { 11, 18, Font11x18 };
-SSD1306_Fonts SSD1306Font_16x26 = { 16, 26, Font16x26 };

@@ -55,7 +55,7 @@ public:
 	 * @param color 字符颜色
 	 * @return 写入的字符
 	 */
-	char WriteChar(char ch, SSD1306_Fonts Font, Color color = Color::White);
+	char WriteChar(char ch, SSD1306Font Font, Color color = Color::White);
 
 	/**
 	 * @brief 写字符串
@@ -64,7 +64,7 @@ public:
 	 * @param color 字符颜色
 	 * @return 写入的字符
 	 */
-	char WriteString(const char *str, SSD1306_Fonts Font, Color color = Color::White);
+	char WriteString(const char *str, SSD1306Font Font, Color color = Color::White);
 
 	/**
 	 * @brief 设置光标位置

@@ -6,7 +6,7 @@ HAL_StatusTypeDef SSD1306::Start() {
 	// 初始化LCD显示屏
 	status += WriteCommand(0xAE); // 发送命令：关闭显示
 	status += WriteCommand(0x20); // 发送命令：设置内存寻址模式
-	status += WriteCommand(0x10); // 发送命令：设置为页面寻址模式 (00=水平寻址模式, 01=垂直寻址模式, 10=页面寻址模式, 11=无效)
+	status += WriteCommand(0x00); // 发送命令：设置为页面寻址模式 (00=水平寻址模式, 01=垂直寻址模式, 10=页面寻址模式, 11=无效)
 	status += WriteCommand(0xB0); // 发送命令：设置页面起始地址为第0到第7页
 	status += WriteCommand(0xC8); // 发送命令：设置COM输出扫描方向
 	status += WriteCommand(0x00); // 发送命令：设置低列地址
@@ -28,14 +28,24 @@ HAL_StatusTypeDef SSD1306::Start() {
 	status += WriteCommand(0xD9); // 发送命令：设置预充电周期
 	status += WriteCommand(0x22); // 设置预充电周期的值
 
-	status += WriteCommand(0xDA); // 发送命令：设置COM引脚硬件配置
+	status += WriteCommand(0xDA); // 发送命令：设置 COM 引脚硬件配置
 	status += WriteCommand(COM_LR_REMAP << 5 | COM_ALTERNATIVE_PIN_CONFIG << 4 | 0x02); // 设置 COM 引脚硬件配置的具体值
 
 	status += WriteCommand(0xDB); // 发送命令：设置 VComH 电平
 	status += WriteCommand(0x20); // 设置 VComH 电平的值为 0.77xVcc
-	status += WriteCommand(0x8D); // 发送命令：设置DC-DC控制
+	status += WriteCommand(0x8D); // 发送命令：设置 DC-DC 控制
 	status += WriteCommand(0x14); // 启用 DC-DC 转换器
 	status += WriteCommand(0xAF); // 发送命令：打开显示屏
+
+	// 设置列地址范围
+	status += WriteCommand(0x21); // 设置列地址命令
+	status += WriteCommand(0);    // 起始列地址
+	status += WriteCommand(WIDTH - 1); // 结束列地址
+
+	// 设置页地址范围
+	status += WriteCommand(0x22); // 设置页地址命令
+	status += WriteCommand(0);    // 起始页地址
+	status += WriteCommand(7);    // 结束页地址（对于64像素高的屏幕，有8页，0-7）
 
 	if (status != 0) {
 		return HAL_ERROR;
@@ -56,7 +66,7 @@ HAL_StatusTypeDef SSD1306::Start() {
 }
 
 HAL_StatusTypeDef SSD1306::WriteCommand(uint8_t command) {
-	return HAL_I2C_Mem_Write(_hi2c, I2C_ADDR, 0x00, 1, &command, 1, 10);
+	return HAL_I2C_Mem_Write(_hi2c, I2C_ADDR, 0x00, I2C_MEMADD_SIZE_8BIT, &command, 1, 10);
 }
 
 void SSD1306::Fill(Color color) {
@@ -67,13 +77,7 @@ void SSD1306::Fill(Color color) {
 }
 
 void SSD1306::UpdateScreen() {
-	for (uint8_t i = 0; i < 8; i++) {
-		WriteCommand(0xB0 + i);
-		WriteCommand(0x00);
-		WriteCommand(0x10);
-
-		HAL_I2C_Mem_Write(_hi2c, I2C_ADDR, 0x40, 1, _buffer.data() + (WIDTH * i), WIDTH, 100);
-	}
+	HAL_I2C_Mem_Write_DMA(_hi2c, I2C_ADDR, 0x40, I2C_MEMADD_SIZE_8BIT, _buffer.data(), _buffer.size());
 }
 
 void SSD1306::DrawPixel(uint8_t x, uint8_t y, Color color/* = Color::White*/) {
@@ -95,7 +99,7 @@ void SSD1306::DrawPixel(uint8_t x, uint8_t y, Color color/* = Color::White*/) {
 	}
 }
 
-char SSD1306::WriteChar(char ch, SSD1306_Fonts Font, Color color/* = Color::White*/) {
+char SSD1306::WriteChar(char ch, SSD1306Font Font, Color color/* = Color::White*/) {
 	// 检查当前行剩余空间
 	if (WIDTH <= (_currentX + Font.FontWidth) || HEIGHT <= (_currentY + Font.FontHeight)) {
 		// 当前行空间不足
@@ -121,7 +125,7 @@ char SSD1306::WriteChar(char ch, SSD1306_Fonts Font, Color color/* = Color::Whit
 	return ch;
 }
 
-char SSD1306::WriteString(const char *str, SSD1306_Fonts Font, Color color/* = Color::White*/) {
+char SSD1306::WriteString(const char *str, SSD1306Font Font, Color color/* = Color::White*/) {
 	// 写入直到空字节
 	while (*str) {
 		if (WriteChar(*str, Font, color) != *str) {

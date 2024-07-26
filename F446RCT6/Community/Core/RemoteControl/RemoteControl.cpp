@@ -1,18 +1,20 @@
 #include "RemoteControl.h"
 
 RemoteControl::RemoteControl(UART_HandleTypeDef *huart)
-	: _huart(huart) {
+	: _huart(huart), _watchDog(TIMEOUT_DURATION, [this]() { RxTimeoutCallback(); }) {
 	Reset();
 }
 
 void RemoteControl::Start() {
 	HAL_UART_Receive_DMA(_huart, _buffer.data(), BUFFER_SIZE);
 	_status = Status::Running;
+	_watchDog.Enable();
 }
 
 void RemoteControl::Stop() {
 	HAL_UART_Abort(_huart);
 	_status = Status::Stopped;
+	_watchDog.Disable();
 }
 
 void RemoteControl::Reset() {
@@ -29,18 +31,13 @@ bool RemoteControl::RxCallback(const UART_HandleTypeDef *huart) {
 		return RxCallbackErrorHandler();
 	}
 
-	_lastReceiveTime = HAL_GetTick();
+	_watchDog.Feed();
 	Start();
 	return true;
 }
 
-void RemoteControl::WatchDog() {
-	uint32_t currentTime = HAL_GetTick();
-	if (_status != Status::Stopped &&
-		_status != Status::Unknown &&
-		(currentTime - _lastReceiveTime) > TIMEOUT_DURATION) {
-		RxTimeoutCallback();
-	}
+void RemoteControl::Tick() {
+	_watchDog.Tick(_status != Status::Stopped && _status != Status::Unknown);
 }
 
 std::optional<RemoteControl::ControllerData> RemoteControl::GetControllerData() const {

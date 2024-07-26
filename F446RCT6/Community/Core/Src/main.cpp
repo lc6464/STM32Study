@@ -25,7 +25,10 @@ int main(void) {
 	MX_CAN2_Init();
 	MX_I2C2_Init();
 	MX_TIM6_Init();
+	MX_TIM7_Init();
 	MX_UART5_Init();
+
+	HAL_Delay(50); // 等待外设启动完成
 
 	remoteControl.Start();
 

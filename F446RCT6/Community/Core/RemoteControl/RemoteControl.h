@@ -5,6 +5,7 @@
 #include <optional>
 
 #include "usart.h"
+#include "WatchDog.h"
 
 class RemoteControl {
 public:
@@ -68,7 +69,7 @@ public:
 	/**
 	 * @brief 看门狗函数，检查是否超时
 	 */
-	void WatchDog();
+	void Tick();
 
 	/**
 	 * @brief 获取当前遥控器状态
@@ -97,7 +98,8 @@ private:
 	ControllerData _controllerData;
 	UART_HandleTypeDef *_huart;
 	Status _status;
-	uint32_t _lastReceiveTime;
+
+	WatchDog _watchDog;
 
 	void Reset();
 	void RxTimeoutCallback();
