@@ -21,7 +21,7 @@ Motor::StatusTypeDef Motor::Stop() {
 	return result;
 }
 
-void Motor::SetSpeed(int16_t speed) {
+void Motor::SetVoltage(int16_t speed) {
 	if (speed > 0 && speed <= 1000) {
 		// 正向旋转: CH3 PWM, CH4 高电平
 		__HAL_TIM_SET_COMPARE(_htim, _channelA, 1000 - speed);

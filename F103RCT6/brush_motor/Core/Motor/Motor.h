@@ -36,7 +36,7 @@ public:
 	 * @param speed 速度值, 范围为 [-1000, 1000]
 	 * @note 速度为正时, 电机正向旋转; 速度为负时, 电机反向旋转; 速度为 0 时, 电机刹车
 	 */
-	void SetSpeed(int16_t speed);
+	void SetVoltage(int16_t speed);
 
 private:
 	TIM_HandleTypeDef *_htim; // 定时器句柄指针

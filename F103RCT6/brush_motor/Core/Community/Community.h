@@ -11,15 +11,9 @@ public:
 	/**
 	 * @brief 构造函数
 	 * @param hcan CAN 句柄指针
-	 */
-	Community(CAN_HandleTypeDef *hcan) : _hcan(hcan) { }
-
-	/**
-	 * @brief 构造函数
-	 * @param hcan CAN 句柄指针
 	 * @param rxCallback 接收回调函数
 	 */
-	Community(CAN_HandleTypeDef *hcan, Community_RxCallback rxCallback) : _hcan(hcan), _rxCallback(rxCallback) { }
+	explicit Community(CAN_HandleTypeDef *hcan, Community_RxCallback rxCallback = nullptr) : _hcan(hcan), _rxCallback(rxCallback) { }
 
 	/**
 	 * @brief 设置接收回调函数
@@ -40,7 +34,7 @@ public:
 	 * @brief 初始化并启动 CAN
 	 * @param filterConfig CAN 过滤器配置
 	 */
-	void Start(CAN_FilterTypeDef *filterConfig);
+	void Start(const CAN_FilterTypeDef &filterConfig);
 
 	/**
 	 * @brief 停止 CAN
@@ -59,12 +53,11 @@ public:
 	 * @brief 发送电机速度
 	 * @param canId CAN ID
 	 * @param mailbox 发送邮箱
-	 * @param speed 取整的实时速度
-	 * @param target 目标速度
-	 * @param pidOut 取整的 PID 输出控制量
+	 * @param left 左速度
+	 * @param right 右速度
 	 * @return 发送状态
 	 */
-	HAL_StatusTypeDef SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t pidOut);
+	HAL_StatusTypeDef SendSpeed(uint16_t canId, uint32_t *mailbox, float left, float right);
 
 	/**
 	 * @brief 执行接收回调函数

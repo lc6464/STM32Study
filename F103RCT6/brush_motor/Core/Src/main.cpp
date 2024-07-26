@@ -1,179 +1,49 @@
-/* USER CODE BEGIN Header */
-/**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2024 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
- /* USER CODE END Header */
- /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "can.h"
-#include "i2c.h"
 #include "tim.h"
 #include "gpio.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-#include "main-addition.h"
-
-// #include "main-addition.h"
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-
-// 四个电机
-Motor motor0(&htim1, TIM_CHANNEL_3, TIM_CHANNEL_4);
-// Motor motor1(&htim1, TIM_CHANNEL_1, TIM_CHANNEL_2);
-// Motor motor2(&htim8, TIM_CHANNEL_3, TIM_CHANNEL_4);
-// Motor motor3(&htim8, TIM_CHANNEL_1, TIM_CHANNEL_2);
-
-// 四个编码器
-Encoder encoder0(&htim3);
-// Encoder encoder1(&htim4);
-// Encoder encoder2(&htim2);
-// Encoder encoder3(&htim5);
-
-// 四个 PID
-PIDController pid0(1.5f, 6.0f, 0.3f, 0.2f, -1000, 1000, -2000, 2000, 0.1f);
-// PIDController pid1(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
-// PIDController pid2(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
-// PIDController pid3(1.0f, 2.0f, 0.1f, 0.1f, -1000, 1000, -800, 800, 0.1f);
-
-// 电机速度发送
-Community community(&hcan, MotorSpeed_SentCallback);
-
-int16_t target_speed = 120;
-//int16_t round_speed = 0;
-int8_t speed_step = 1;
-
-uint8_t sent_times = 0;
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
+#include "Community_Shared.h"
+#include "Encoder_Shared.h"
+#include "Motor_Shared.h"
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void) {
-
-	/* USER CODE BEGIN 1 */
-
-	/* USER CODE END 1 */
-
-	/* MCU Configuration--------------------------------------------------------*/
-
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
-
-	/* USER CODE BEGIN Init */
-
-	/* USER CODE END Init */
-
-	/* Configure the system clock */
 	SystemClock_Config();
 
-	/* USER CODE BEGIN SysInit */
-
-	/* USER CODE END SysInit */
-
-	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-	MX_CAN_Init();
 	MX_TIM1_Init();
-	MX_TIM2_Init();
 	MX_TIM3_Init();
-	MX_TIM4_Init();
-	MX_TIM5_Init();
 	MX_TIM6_Init();
+	MX_TIM5_Init();
 	MX_TIM8_Init();
-	MX_I2C2_Init();
-	/* USER CODE BEGIN 2 */
+	MX_CAN_Init();
+	MX_TIM7_Init();
 
 	community.Start();
 
-	encoder0.Start();
-	// encoder1.Start();
-	// encoder2.Start();
-	// encoder3.Start();
+	leftEncoder.Start();
+	rightEncoder.Start();
 
-	motor0.Start();
-	// motor1.Start();
-	// motor2.Start();
-	// motor3.Start();
+	leftMotor.Start();
+	rightMotor.Start();
 
 	HAL_TIM_Base_Start_IT(&htim6);
+	HAL_TIM_Base_Start_IT(&htim7);
 
-	/* USER CODE END 2 */
-
-	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
 	while (1) {
-		// 电机速度：300 -> -300 | 3s | -300 -> 300 | 3s
-		/*if (target_speed >= 300 || target_speed <= -300) {
-			speed_step = -speed_step;
-			HAL_Delay(3000);
-		}
 
-		target_speed += speed_step;
-		//round_speed += speed_step;
-		HAL_Delay(50);*/
-
-		target_speed = 100;
-		HAL_Delay(15000);
-		target_speed = 0;
-		HAL_Delay(15000);
-
-		/* USER CODE END WHILE */
-
-		/* USER CODE BEGIN 3 */
 	}
-	/* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void) {
 
 #pragma GCC diagnostic push
