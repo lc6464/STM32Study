@@ -52,6 +52,7 @@ int main(void) {
 	ssd1306.Start();
 
 	HAL_TIM_Base_Start_IT(&htim6);
+	HAL_TIM_Base_Start_IT(&htim7);
 
 	while (1) {
 

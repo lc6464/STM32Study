@@ -190,9 +190,15 @@ void MapRemoteToStatusAndMode() {
 
 // 定时器中断回调函数
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM6) { // 100ms
+	if (htim->Instance == TIM7) { // 10ms
 		// Watchdogs
 		remoteControl.Tick();
+
+		return;
+	}
+
+	if (htim->Instance == TIM6) { // 100ms
+		// Watchdogs
 		communityWatchDog.Tick();
 
 		// 更新当前系统状态和速度模式
@@ -264,8 +270,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ssd1306.WriteString(buffer, SSD1306Fonts::Font_7x10);
 
 		ssd1306.UpdateScreen();
-	}
 
+		return;
+	}
 }
 
 
