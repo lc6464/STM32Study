@@ -3,4 +3,8 @@
 
 Status systemStatus = Status::Error;
 
-WatchDog systemWatchDog(300, []() { systemStatus = Status::Error; leftTarget = 0; rightTarget = 0; });
+WatchDog systemWatchDog(300, []() {
+  systemStatus = Status::Error;
+  leftTarget = 0;
+  rightTarget = 0;
+});

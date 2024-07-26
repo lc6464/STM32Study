@@ -41,8 +41,7 @@
      PA15   ------> S_TIM2_CH1_ETR
      PB3   ------> S_TIM2_CH2
 */
-void MX_GPIO_Init(void)
-{
+void MX_GPIO_Init(void) {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -75,7 +74,6 @@ void MX_GPIO_Init(void)
 
   /*Configure peripheral I/O remapping */
   __HAL_AFIO_REMAP_TIM2_PARTIAL_1();
-
 }
 
 /* USER CODE BEGIN 2 */

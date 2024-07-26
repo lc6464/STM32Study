@@ -2,10 +2,7 @@
 
 #include "WatchDog.h"
 
-enum class Status {
-	OK,
-	Error
-};
+enum class Status { OK, Error };
 
 extern Status systemStatus;
 
