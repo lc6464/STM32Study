@@ -1,36 +1,36 @@
 /* USER CODE BEGIN Header */
 /**
-	******************************************************************************
-	* @file           : main.c
-	* @brief          : Main program body
-	******************************************************************************
-	* @attention
-	*
-	* Copyright (c) 2024 STMicroelectronics.
-	* All rights reserved.
-	*
-	* This software is licensed under terms that can be found in the LICENSE file
-	* in the root directory of this software component.
-	* If no LICENSE file comes with this software, it is provided AS-IS.
-	*
-	******************************************************************************
-	*/
-	/* USER CODE END Header */
-	/* Includes ------------------------------------------------------------------*/
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "can.h"
 #include "dma.h"
+#include "gpio.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "RemoteControl.h"
 #include "community.h"
 #include "fonts.h"
-#include "RemoteControl.h"
 #include "ssd1306.h"
 #include "strings.h"
 
@@ -70,97 +70,99 @@ RemoteControl::ControllerData controllerData; // 扔到全局方便调试
 /* USER CODE BEGIN PFP */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM6) { // 100ms
-		// RC Watchdog
-		remoteControl.WatchDog();
+  if (htim->Instance == TIM6) { // 100ms
+    // RC Watchdog
+    remoteControl.WatchDog();
 
-		// 每 300ms 刷新一次屏幕
-		if (++screenScaler == 3) {
-			screenScaler = 0;
+    // 每 300ms 刷新一次屏幕
+    if (++screenScaler == 3) {
+      screenScaler = 0;
 
-			char buffer[64] = { 0 };
+      char buffer[64] = {0};
 
-			ssd1306_Fill(Black);
+      ssd1306_Fill(Black);
 
-			// 展示遥控器信息
-			ssd1306_SetCursor(25, 0);
-			ssd1306_WriteString("RC Info", Font_11x18, White);
+      // 展示遥控器信息
+      ssd1306_SetCursor(25, 0);
+      ssd1306_WriteString("RC Info", Font_11x18, White);
 
-			if (remoteControl.GetStatus() != RemoteControl::Status::Running) {
-				ssd1306_SetCursor(0, 20);
-				ssd1306_WriteString("ERROR", Font_11x18, White);
-			} else {
-				ssd1306_SetCursor(0, 20);
-				ssd1306_WriteString("S L:", Font_7x10, White);
-				ssd1306_SetCursor(0, 30);
-				ssd1306_WriteString("S R:", Font_7x10, White);
-				ssd1306_SetCursor(0, 40);
-				ssd1306_WriteString("3PS:", Font_7x10, White);
-				ssd1306_SetCursor(0, 50);
-				ssd1306_WriteString("Dial:", Font_7x10, White);
+      if (remoteControl.GetStatus() != RemoteControl::Status::Running) {
+        ssd1306_SetCursor(0, 20);
+        ssd1306_WriteString("ERROR", Font_11x18, White);
+      } else {
+        ssd1306_SetCursor(0, 20);
+        ssd1306_WriteString("S L:", Font_7x10, White);
+        ssd1306_SetCursor(0, 30);
+        ssd1306_WriteString("S R:", Font_7x10, White);
+        ssd1306_SetCursor(0, 40);
+        ssd1306_WriteString("3PS:", Font_7x10, White);
+        ssd1306_SetCursor(0, 50);
+        ssd1306_WriteString("Dial:", Font_7x10, White);
 
-				// Stick L: X,Y
-				ssd1306_SetCursor(40, 20);
-				auto length = int16ToString(controllerData.LeftStickX, buffer, 0);
-				buffer[length++] = ',';
-				int16ToString(controllerData.LeftStickY, buffer + length, 0);
-				ssd1306_WriteString(buffer, Font_7x10, White);
+        // Stick L: X,Y
+        ssd1306_SetCursor(40, 20);
+        auto length = int16ToString(controllerData.LeftStickX, buffer, 0);
+        buffer[length++] = ',';
+        int16ToString(controllerData.LeftStickY, buffer + length, 0);
+        ssd1306_WriteString(buffer, Font_7x10, White);
 
-				// Stick R: X,Y
-				ssd1306_SetCursor(40, 30);
-				length = int16ToString(controllerData.RightStickX, buffer, 0);
-				buffer[length++] = ',';
-				int16ToString(controllerData.RightStickY, buffer + length, 0);
-				ssd1306_WriteString(buffer, Font_7x10, White);
+        // Stick R: X,Y
+        ssd1306_SetCursor(40, 30);
+        length = int16ToString(controllerData.RightStickX, buffer, 0);
+        buffer[length++] = ',';
+        int16ToString(controllerData.RightStickY, buffer + length, 0);
+        ssd1306_WriteString(buffer, Font_7x10, White);
 
-				// 3PS: L,R
-				ssd1306_SetCursor(40, 40);
-				length = uint8ToString(static_cast<uint8_t>(controllerData.LeftSwitch), buffer, 0);
-				buffer[length++] = ',';
-				int16ToString(static_cast<uint8_t>(controllerData.RightSwitch), buffer + length, 0);
-				ssd1306_WriteString(buffer, Font_7x10, White);
+        // 3PS: L,R
+        ssd1306_SetCursor(40, 40);
+        length = uint8ToString(static_cast<uint8_t>(controllerData.LeftSwitch),
+                               buffer, 0);
+        buffer[length++] = ',';
+        int16ToString(static_cast<uint8_t>(controllerData.RightSwitch),
+                      buffer + length, 0);
+        ssd1306_WriteString(buffer, Font_7x10, White);
 
-				// Dial: D
-				ssd1306_SetCursor(40, 50);
-				int16ToString(controllerData.Dial, buffer, 0);
-				ssd1306_WriteString(buffer, Font_7x10, White);
-			}
+        // Dial: D
+        ssd1306_SetCursor(40, 50);
+        int16ToString(controllerData.Dial, buffer, 0);
+        ssd1306_WriteString(buffer, Font_7x10, White);
+      }
 
-			ssd1306_UpdateScreen(&hi2c2);
-		}
-	}
+      ssd1306_UpdateScreen(&hi2c2);
+    }
+  }
 }
 
 // 串口 DMA 接收完成回调
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	if (remoteControl.RxCallback(huart)) {
-		// 如果接收成功
-		remoteControl >> controllerData;
-		return;
-	}
+  if (remoteControl.RxCallback(huart)) {
+    // 如果接收成功
+    remoteControl >> controllerData;
+    return;
+  }
 }
 
+inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader,
+                                        uint8_t *rxData) {
+  if (rxHeader->StdId == 0x1f0 && rxHeader->DLC == 6) {
+    // 如果接收到的是 ID 为 0x1f0 的 6 字节数据
+    /*
+            txData[0] = static_cast<uint8_t>(speed);
+            txData[1] = static_cast<uint8_t>(speed >> 8);
+            txData[2] = static_cast<uint8_t>(target);
+            txData[3] = static_cast<uint8_t>(target >> 8);
+            txData[4] = static_cast<uint8_t>(pidOut);
+            txData[5] = static_cast<uint8_t>(pidOut >> 8);
+    */
 
-inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
-	if (rxHeader->StdId == 0x1f0 && rxHeader->DLC == 6) {
-		// 如果接收到的是 ID 为 0x1f0 的 6 字节数据
-		/*
-			txData[0] = static_cast<uint8_t>(speed);
-			txData[1] = static_cast<uint8_t>(speed >> 8);
-			txData[2] = static_cast<uint8_t>(target);
-			txData[3] = static_cast<uint8_t>(target >> 8);
-			txData[4] = static_cast<uint8_t>(pidOut);
-			txData[5] = static_cast<uint8_t>(pidOut >> 8);
-		*/
+    // 从 rxData 中解析出数据
+    speed = rxData[0] | (rxData[1] << 8);
+    target = rxData[2] | (rxData[3] << 8);
+    pidOut = rxData[4] | (rxData[5] << 8);
 
-		// 从 rxData 中解析出数据
-		speed = rxData[0] | (rxData[1] << 8);
-		target = rxData[2] | (rxData[3] << 8);
-		pidOut = rxData[4] | (rxData[5] << 8);
-
-		return true;
-	}
-	return false;
+    return true;
+  }
+  return false;
 }
 
 // 电机速度接收
@@ -168,28 +170,28 @@ Community community0(&hcan1, MotorSpeed_ReceivedCallback);
 Community community1(&hcan2, MotorSpeed_ReceivedCallback);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
-	CAN_RxHeaderTypeDef rx_header;
-	uint8_t rx_data[8];
+  CAN_RxHeaderTypeDef rx_header;
+  uint8_t rx_data[8];
 
-	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data); // 接收数据
+  HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data); // 接收数据
 
-	if (community1.ExecuteRxCallback(&rx_header, rx_data)) {
-		// 对 0x200 发送 0x00
-		CAN_TxHeaderTypeDef tx_header;
-		uint8_t tx_data[1] = { 0 };
+  if (community1.ExecuteRxCallback(&rx_header, rx_data)) {
+    // 对 0x200 发送 0x00
+    CAN_TxHeaderTypeDef tx_header;
+    uint8_t tx_data[1] = {0};
 
-		tx_header.StdId = 0x200;
-		tx_header.IDE = CAN_ID_STD;
-		tx_header.RTR = CAN_RTR_DATA;
-		tx_header.DLC = 1;
-		tx_header.TransmitGlobalTime = DISABLE;
+    tx_header.StdId = 0x200;
+    tx_header.IDE = CAN_ID_STD;
+    tx_header.RTR = CAN_RTR_DATA;
+    tx_header.DLC = 1;
+    tx_header.TransmitGlobalTime = DISABLE;
 
-		uint32_t mailbox;
+    uint32_t mailbox;
 
-		community1.Transmit(&tx_header, tx_data, &mailbox);
+    community1.Transmit(&tx_header, tx_data, &mailbox);
 
-		return;
-	}
+    return;
+  }
 }
 
 /* USER CODE END PFP */
@@ -200,132 +202,134 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 /* USER CODE END 0 */
 
 /**
-	* @brief  The application entry point.
-	* @retval int
-	*/
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void) {
 
-	/* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 
-	/* USER CODE END 1 */
+  /* USER CODE END 1 */
 
-	/* MCU Configuration--------------------------------------------------------*/
+  /* MCU Configuration--------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
+  HAL_Init();
 
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-	/* USER CODE END Init */
+  /* USER CODE END Init */
 
-	/* Configure the system clock */
-	SystemClock_Config();
+  /* Configure the system clock */
+  SystemClock_Config();
 
-	/* USER CODE BEGIN SysInit */
+  /* USER CODE BEGIN SysInit */
 
-	/* USER CODE END SysInit */
+  /* USER CODE END SysInit */
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_DMA_Init();
-	MX_CAN1_Init();
-	MX_CAN2_Init();
-	MX_I2C2_Init();
-	MX_TIM6_Init();
-	MX_UART5_Init();
-	/* USER CODE BEGIN 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_CAN1_Init();
+  MX_CAN2_Init();
+  MX_I2C2_Init();
+  MX_TIM6_Init();
+  MX_UART5_Init();
+  /* USER CODE BEGIN 2 */
 
-	// 启用空闲中断
-	// __HAL_UART_ENABLE_IT(&huart5, UART_IT_IDLE);
+  // 启用空闲中断
+  // __HAL_UART_ENABLE_IT(&huart5, UART_IT_IDLE);
 
-	remoteControl.Start();
+  remoteControl.Start();
 
-	community0.Start();
+  community0.Start();
 
-	CAN_FilterTypeDef filterConfig;
+  CAN_FilterTypeDef filterConfig;
 
-	filterConfig.FilterBank = 14;
-	filterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-	filterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	filterConfig.FilterIdHigh = 0;
-	filterConfig.FilterIdLow = 0;
-	filterConfig.FilterMaskIdHigh = 0;
-	filterConfig.FilterMaskIdLow = 0;
-	filterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
-	filterConfig.FilterActivation = ENABLE;
-	filterConfig.SlaveStartFilterBank = 14;
+  filterConfig.FilterBank = 14;
+  filterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+  filterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+  filterConfig.FilterIdHigh = 0;
+  filterConfig.FilterIdLow = 0;
+  filterConfig.FilterMaskIdHigh = 0;
+  filterConfig.FilterMaskIdLow = 0;
+  filterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+  filterConfig.FilterActivation = ENABLE;
+  filterConfig.SlaveStartFilterBank = 14;
 
-	community1.Start(&filterConfig);
+  community1.Start(&filterConfig);
 
-	ssd1306_Init(&hi2c2);
+  ssd1306_Init(&hi2c2);
 
-	HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim6);
 
-	/* USER CODE END 2 */
+  /* USER CODE END 2 */
 
-	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
-	while (1) {
-		/* USER CODE END WHILE */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1) {
+    /* USER CODE END WHILE */
 
-		/* USER CODE BEGIN 3 */
-	}
-	/* USER CODE END 3 */
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
 }
 
 /**
-	* @brief System Clock Configuration
-	* @retval None
-	*/
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void) {
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers" // 这段代码由 CubeMX 自动生成，不做出修改
+#pragma GCC diagnostic ignored                                                 \
+    "-Wmissing-field-initializers" // 这段代码由 CubeMX 自动生成，不做出修改
 
-	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
 #pragma GCC diagnostic pop
 
-	/** Configure the main internal regulator output voltage
-	*/
-	__HAL_RCC_PWR_CLK_ENABLE();
-	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  /** Configure the main internal regulator output voltage
+   */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-	/** Initializes the RCC Oscillators according to the specified parameters
-	* in the RCC_OscInitTypeDef structure.
-	*/
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-	RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
-	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-	RCC_OscInitStruct.PLL.PLLM = 4;
-	RCC_OscInitStruct.PLL.PLLN = 180;
-	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-	RCC_OscInitStruct.PLL.PLLQ = 2;
-	RCC_OscInitStruct.PLL.PLLR = 2;
-	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-		Error_Handler();
-	}
+  /** Initializes the RCC Oscillators according to the specified parameters
+   * in the RCC_OscInitTypeDef structure.
+   */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLN = 180;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
+  }
 
-	/** Activate the Over-Drive mode
-	*/
-	if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
-		Error_Handler();
-	}
+  /** Activate the Over-Drive mode
+   */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
+    Error_Handler();
+  }
 
-	/** Initializes the CPU, AHB and APB buses clocks
-	*/
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-		| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  /** Initializes the CPU, AHB and APB buses clocks
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
+                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
-		Error_Handler();
-	}
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
+    Error_Handler();
+  }
 }
 
 /* USER CODE BEGIN 4 */
@@ -333,30 +337,31 @@ void SystemClock_Config(void) {
 /* USER CODE END 4 */
 
 /**
-	* @brief  This function is executed in case of error occurrence.
-	* @retval None
-	*/
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void) {
-	/* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
-	__disable_irq();
-	while (1) {
-	}
-	/* USER CODE END Error_Handler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1) {
+  }
+  /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-	* @brief  Reports the name of the source file and the source line number
-	*         where the assert_param error has occurred.
-	* @param  file: pointer to the source file name
-	* @param  line: assert_param error line source number
-	* @retval None
-	*/
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line) {
-	/* USER CODE BEGIN 6 */
-	/* User can add his own implementation to report the file name and line number,
-		 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-		 /* USER CODE END 6 */
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line
+     number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
+     line) */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
