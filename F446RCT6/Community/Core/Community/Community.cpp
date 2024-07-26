@@ -14,11 +14,11 @@ void Community::Start() {
 	filterConfig.FilterActivation = ENABLE;
 	filterConfig.SlaveStartFilterBank = 14;
 
-	Start(&filterConfig);
+	Start(filterConfig);
 }
 
-void Community::Start(CAN_FilterTypeDef *filterConfig) {
-	HAL_CAN_ConfigFilter(_hcan, filterConfig);
+void Community::Start(const CAN_FilterTypeDef &filterConfig) {
+	HAL_CAN_ConfigFilter(_hcan, &filterConfig);
 	HAL_CAN_Start(_hcan);
 	HAL_CAN_ActivateNotification(_hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
 }
@@ -32,21 +32,23 @@ HAL_StatusTypeDef Community::Transmit(CAN_TxHeaderTypeDef *txHeader, uint8_t *tx
 }
 
 HAL_StatusTypeDef Community::SendMotorSpeed(uint16_t canId, uint32_t *mailbox, int16_t speed, int16_t target, int16_t pidOut) {
-	CAN_TxHeaderTypeDef txHeader;
-	uint8_t txData[8];
+	CAN_TxHeaderTypeDef txHeader = {
+		.StdId = canId,
+		.ExtId = 0,
+		.IDE = CAN_ID_STD,
+		.RTR = CAN_RTR_DATA,
+		.DLC = 6,
+		.TransmitGlobalTime = DISABLE
+	};
 
-	txHeader.StdId = canId;
-	txHeader.IDE = CAN_ID_STD;
-	txHeader.RTR = CAN_RTR_DATA;
-	txHeader.DLC = 6;
-	txHeader.TransmitGlobalTime = DISABLE;
-
-	txData[0] = static_cast<uint8_t>(speed);
-	txData[1] = static_cast<uint8_t>(speed >> 8);
-	txData[2] = static_cast<uint8_t>(target);
-	txData[3] = static_cast<uint8_t>(target >> 8);
-	txData[4] = static_cast<uint8_t>(pidOut);
-	txData[5] = static_cast<uint8_t>(pidOut >> 8);
+	uint8_t txData[6] = {
+		static_cast<uint8_t>(speed),
+		static_cast<uint8_t>(speed >> 8),
+		static_cast<uint8_t>(target),
+		static_cast<uint8_t>(target >> 8),
+		static_cast<uint8_t>(pidOut),
+		static_cast<uint8_t>(pidOut >> 8)
+	};
 
 	return Transmit(&txHeader, txData, mailbox);
 }

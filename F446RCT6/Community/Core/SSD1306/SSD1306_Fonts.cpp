@@ -1,7 +1,4 @@
-
-#include "fonts.h"
-
-// Bitmaps for 3 different fonts
+#include "SSD1306_Fonts.h"
 
 static const uint16_t Font7x10[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -484,9 +481,7 @@ static const uint16_t Font11x18[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // ~
 };
 
-static const uint16_t
-Font16x26[] =
-{
+static const uint16_t Font16x26[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -869,6 +864,6 @@ Font16x26[] =
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // Ascii = [~]
 };
 
-FontDef Font_7x10 = { 7, 10, Font7x10 };
-FontDef Font_11x18 = { 11, 18, Font11x18 };
-FontDef Font_16x26 = { 16, 26, Font16x26 };
+SSD1306_Fonts SSD1306Font_7x10 = { 7, 10, Font7x10 };
+SSD1306_Fonts SSD1306Font_11x18 = { 11, 18, Font11x18 };
+SSD1306_Fonts SSD1306Font_16x26 = { 16, 26, Font16x26 };

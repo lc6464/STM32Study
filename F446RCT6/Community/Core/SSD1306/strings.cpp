@@ -1,7 +1,7 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 #include "strings.h"
 
@@ -18,7 +18,7 @@ static void reverse(char *str, int length) {
 }
 
 // 将 uint8_t 转换为字符串
-int uint8ToString(uint8_t x, char str[], uint8_t minLength) {
+int uint8ToString(uint8_t x, char str[], uint8_t minLength/* = 0*/) {
 	int i = 0;
 
 	minLength = minLength == 0 ? 1 : minLength;
@@ -39,7 +39,7 @@ int uint8ToString(uint8_t x, char str[], uint8_t minLength) {
 }
 
 // 将 int8_t 转换为字符串
-int int8ToString(int8_t x, char str[], uint8_t minLength) {
+int int8ToString(int8_t x, char str[], uint8_t minLength/* = 0*/) {
 	int i = 0, isNegative = 0;
 
 	minLength = minLength == 0 ? 1 : minLength;
@@ -69,7 +69,7 @@ int int8ToString(int8_t x, char str[], uint8_t minLength) {
 }
 
 // 将 uint16_t 转换为字符串
-int uint16ToString(uint16_t x, char str[], uint8_t minLength) {
+int uint16ToString(uint16_t x, char str[], uint8_t minLength/* = 0*/) {
 	int i = 0;
 
 	minLength = minLength == 0 ? 1 : minLength;
@@ -90,7 +90,7 @@ int uint16ToString(uint16_t x, char str[], uint8_t minLength) {
 }
 
 // 将 int16_t 转换为字符串
-int int16ToString(int16_t x, char str[], uint8_t minLength) {
+int int16ToString(int16_t x, char str[], uint8_t minLength/* = 0*/) {
 	int i = 0, isNegative = 0;
 
 	minLength = minLength == 0 ? 1 : minLength;
@@ -120,7 +120,7 @@ int int16ToString(int16_t x, char str[], uint8_t minLength) {
 }
 
 // 将 uint32_t 转换为字符串
-int uint32ToString(uint32_t x, char str[], uint8_t minLength) {
+int uint32ToString(uint32_t x, char str[], uint8_t minLength/* = 0*/) {
 	int i = 0;
 
 	minLength = minLength == 0 ? 1 : minLength;
@@ -141,7 +141,7 @@ int uint32ToString(uint32_t x, char str[], uint8_t minLength) {
 }
 
 // 将 int32_t 转换为字符串
-int int32ToString(int32_t x, char str[], uint8_t minLength) {
+int int32ToString(int32_t x, char str[], uint8_t minLength/* = 0*/) {
 	int i = 0, isNegative = 0;
 
 	minLength = minLength == 0 ? 1 : minLength;
@@ -186,19 +186,19 @@ int int64ToString(int64_t x, char *output) {
 		isNegative = 1;
 	}
 
-	int32_t high = (int32_t)(x / 1000000000), low = (int32_t)(x % 1000000000);
+	int32_t high = static_cast<int32_t>(x / 1000000000), low = static_cast<int32_t>(x % 1000000000);
 
 	char highString[11];
 	char lowString[11];
 
-	int highStringLength = int32ToString(high, highString, 0), lowStringLength;
+	int highStringLength = int32ToString(high, highString), lowStringLength;
 
 	if (high) {
 		lowStringLength = int32ToString(low, lowString, 9); // 低位需要前导零
 		memcpy(output, highString, highStringLength);
 		memcpy(output + highStringLength, lowString, lowStringLength + 1);
 	} else {
-		lowStringLength = int32ToString(low, output, 0); // 没有高位，低位无需前导零
+		lowStringLength = int32ToString(low, output); // 没有高位，低位无需前导零
 	}
 
 	return highStringLength + lowStringLength +
@@ -212,12 +212,12 @@ int floatToString(float value, char *output, uint8_t precision) {
 	int isNegative = 0;
 
 	// 检查特殊值
-	if (isnan(value)) {
+	if (std::isnan(value)) {
 		char temp[] = "NaN";
 		memcpy(output, temp, 4);
 		return 3;
 	}
-	if (isinf(value)) {
+	if (std::isinf(value)) {
 		if (value > 0) {
 			char temp[] = "Infinity";
 			memcpy(output, temp, 9);
@@ -236,8 +236,8 @@ int floatToString(float value, char *output, uint8_t precision) {
 		isNegative = 1;
 	}
 
-	int32_t intPart = (int32_t)value;         // 获取整数部分
-	float floatPart = value - (float)intPart; // 获取小数部分
+	int32_t intPart = static_cast<int32_t>(value);         // 获取整数部分
+	float floatPart = value - static_cast<float>(intPart); // 获取小数部分
 
 	char intString[12];
 	int intStringLength = int32ToString(intPart, intString, 0);
@@ -259,16 +259,20 @@ int floatToString(float value, char *output, uint8_t precision) {
 	}
 
 	// 计算小数部分
-	char decimalString[precision + 1];
+	char *decimalString = new char[precision + 1]; // 申请足够的空间，记得释放！
+
 	for (int i = 0; i < precision; ++i) {
 		floatPart *= 10;
-		int digit = (int)floatPart;
+		int digit = static_cast<int>(floatPart);
 		floatPart -= digit;
 		decimalString[i] = '0' + digit;
 	}
 
 	decimalString[precision] = '\0';
 	memcpy(output, decimalString, precision);
+
+	delete[] decimalString; // 释放内存
+
 	output += precision;
 
 	*output = '\0'; // 字符串终止符

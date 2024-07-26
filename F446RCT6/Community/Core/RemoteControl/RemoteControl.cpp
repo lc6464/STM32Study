@@ -68,26 +68,31 @@ bool RemoteControl::RxCallbackErrorHandler() {
 bool RemoteControl::ParseReceivedData() {
 	// 解算接收到的数据
 	_controllerData.RightStickX = (_buffer[0] | (_buffer[1] << 8)) & 0x07ff;
+	_controllerData.RightStickX -= 1024;
 	if (!IsValidChannelData(_controllerData.RightStickX)) {
 		return false;
 	}
 
 	_controllerData.RightStickY = ((_buffer[1] >> 3) | (_buffer[2] << 5)) & 0x07ff;
+	_controllerData.RightStickY -= 1024;
 	if (!IsValidChannelData(_controllerData.RightStickY)) {
 		return false;
 	}
 
 	_controllerData.LeftStickX = ((_buffer[2] >> 6) | (_buffer[3] << 2) | (_buffer[4] << 10)) & 0x07ff;
+	_controllerData.LeftStickX -= 1024;
 	if (!IsValidChannelData(_controllerData.LeftStickX)) {
 		return false;
 	}
 
 	_controllerData.LeftStickY = ((_buffer[4] >> 1) | (_buffer[5] << 7)) & 0x07ff;
+	_controllerData.LeftStickY -= 1024;
 	if (!IsValidChannelData(_controllerData.LeftStickY)) {
 		return false;
 	}
 
 	_controllerData.Dial = ((_buffer[16]) | (_buffer[17] << 8)) & 0x07ff;
+	_controllerData.Dial -= 1024;
 	if (!IsValidChannelData(_controllerData.Dial)) {
 		return false;
 	}

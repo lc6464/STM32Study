@@ -93,8 +93,7 @@ private:
 	static constexpr size_t BUFFER_SIZE = 18;
 	static constexpr uint32_t TIMEOUT_DURATION = 50; // ms
 
-	std::array<uint8_t, BUFFER_SIZE> _buffer;
-
+	std::array<uint8_t, BUFFER_SIZE> _buffer{};
 	ControllerData _controllerData;
 	UART_HandleTypeDef *_huart;
 	Status _status;
@@ -106,6 +105,6 @@ private:
 	bool ParseReceivedData();
 
 	static bool IsValidChannelData(int16_t data) {
-		return data >= 364 && data <= 1684;
+		return data >= -660 && data <= 660;
 	}
 };
