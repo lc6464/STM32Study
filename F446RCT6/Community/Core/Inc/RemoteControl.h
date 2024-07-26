@@ -94,6 +94,7 @@ private:
 	static constexpr uint32_t TIMEOUT_DURATION = 50; // ms
 
 	std::array<uint8_t, BUFFER_SIZE> _buffer;
+
 	ControllerData _controllerData;
 	UART_HandleTypeDef *_huart;
 	Status _status;

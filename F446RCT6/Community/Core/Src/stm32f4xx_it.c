@@ -241,8 +241,6 @@ void UART5_IRQHandler(void)
   HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN UART5_IRQn 1 */
 
-	HAL_UART_IDLE_Callback(&huart5);
-
   /* USER CODE END UART5_IRQn 1 */
 }
 

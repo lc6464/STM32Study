@@ -6,20 +6,16 @@ RemoteControl::RemoteControl(UART_HandleTypeDef *huart)
 }
 
 void RemoteControl::Start() {
-	_status = Status::Running;
 	HAL_UART_Receive_DMA(_huart, _buffer.data(), BUFFER_SIZE);
-
-	// 启用空闲中断
-	__HAL_UART_ENABLE_IT(_huart, UART_IT_IDLE);
+	_status = Status::Running;
 }
 
 void RemoteControl::Stop() {
-	_status = Status::Stopped;
 	HAL_UART_Abort(_huart);
+	_status = Status::Stopped;
 }
 
 void RemoteControl::Reset() {
-	Stop();
 	_controllerData = { 1024, 1024, 1024, 1024, SwitchPosition::Unknown, SwitchPosition::Unknown, 1024 };
 	_status = Status::Unknown;
 }
@@ -56,12 +52,14 @@ std::optional<RemoteControl::ControllerData> RemoteControl::GetControllerData() 
 
 void RemoteControl::RxTimeoutCallback() {
 	Reset();
+	Stop();
 	Start();
 	_status = Status::Timeout;
 }
 
 bool RemoteControl::RxCallbackErrorHandler() {
 	Reset();
+	Stop();
 	Start();
 	_status = Status::Error;
 	return false;

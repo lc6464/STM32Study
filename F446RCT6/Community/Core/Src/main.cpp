@@ -22,8 +22,8 @@
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
-#include "gpio.h"
 #include "usart.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -72,7 +72,7 @@ RemoteControl::ControllerData controllerData; // 扔到全局方便调试
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM6) { // 100ms
 		// RC Watchdog
-		//remoteControl.WatchDog();
+		remoteControl.WatchDog();
 
 		// 每 300ms 刷新一次屏幕
 		if (++screenScaler == 3) {
@@ -128,23 +128,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 			ssd1306_UpdateScreen(&hi2c2);
 		}
-	}
-}
-
-// 串口空闲中断回调
-void HAL_UART_IDLE_Callback(UART_HandleTypeDef *huart) {
-	if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE)) {
-
-		// 判断是否空闲中断
-		uint32_t data_length = 18 - __HAL_DMA_GET_COUNTER(huart->hdmarx);
-		if (remoteControl.RxCallback(huart)) {
-			// 如果接收成功
-			remoteControl >> controllerData;
-
-
-			return;
-		}
-		__HAL_UART_CLEAR_IDLEFLAG(huart); // 清除串口空闲中断标志位
 	}
 }
 
@@ -251,6 +234,9 @@ int main(void) {
 	MX_TIM6_Init();
 	MX_UART5_Init();
 	/* USER CODE BEGIN 2 */
+
+	// 启用空闲中断
+	// __HAL_UART_ENABLE_IT(&huart5, UART_IT_IDLE);
 
 	remoteControl.Start();
 
