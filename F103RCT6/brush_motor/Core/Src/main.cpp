@@ -3,6 +3,7 @@
 #include "tim.h"
 #include "gpio.h"
 
+#include "Callbacks_Shared.h"
 #include "Community_Shared.h"
 #include "Encoder_Shared.h"
 #include "Motor_Shared.h"
@@ -25,6 +26,7 @@ int main(void) {
 	MX_TIM7_Init();
 
 	community.Start();
+	systemWatchDog.Enable();
 
 	leftEncoder.Start();
 	rightEncoder.Start();

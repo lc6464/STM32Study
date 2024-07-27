@@ -11,7 +11,7 @@ float rightSpeed = 0;  // 右轮速度
 float leftTarget = 0;  // 左轮目标速度
 float rightTarget = 0; // 右轮目标速度
 
-inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
+bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {
 	if (rxHeader->DLC == 8) {
 		if (rxHeader->StdId == 0x002) {
 			// 如果接收到的是 ID 为 0x002 的 8 字节数据

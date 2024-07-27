@@ -25,8 +25,31 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		leftSpeed = leftEncoder.Update();
 		rightSpeed = rightEncoder.Update();
 
-		float leftResult = leftPID.Update(leftTarget, leftSpeed);
-		float rightResult = rightPID.Update(rightTarget, rightSpeed);
+		float leftResult = 0;
+		float rightResult = 0;
+
+		if (systemStatus == Status::Error) {
+			leftPID.Reset();
+			rightPID.Reset();
+			leftTarget = 0;
+			rightTarget = 0;
+		} else {
+			// PID 控制
+
+			if (std::abs(leftTarget) < 10 && std::abs(leftSpeed) < 30) {
+				leftPID.Reset();
+				leftTarget = 0;
+			} else {
+				leftResult = leftPID.Update(leftTarget, leftSpeed);
+			}
+
+			if (std::abs(rightTarget) < 10 && std::abs(rightSpeed) < 30) {
+				rightPID.Reset();
+				rightTarget = 0;
+			} else {
+				rightResult = rightPID.Update(rightTarget, rightSpeed);
+			}
+		}
 
 		leftMotor.SetVoltage(static_cast<int16_t>(leftResult));
 		rightMotor.SetVoltage(static_cast<int16_t>(rightResult));

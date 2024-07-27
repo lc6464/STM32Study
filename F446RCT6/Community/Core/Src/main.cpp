@@ -48,6 +48,7 @@ int main(void) {
 	filterConfig.SlaveStartFilterBank = 14;
 
 	community1.Start(filterConfig);
+	communityWatchDog.Enable();
 
 	ssd1306.Start();
 
