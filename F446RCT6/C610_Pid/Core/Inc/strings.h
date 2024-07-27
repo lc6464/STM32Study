@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
+#include <stdint.h>
 
 int uint8ToString(uint8_t x, char str[], uint8_t minLength);
 int int8ToString(int8_t x, char str[], uint8_t minLength);

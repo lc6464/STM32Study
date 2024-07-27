@@ -26,6 +26,8 @@ void MapRemoteToMotorSpeed(int16_t remoteX, int16_t remoteY, float &leftMotorSpe
 	if (mode == SpeedMode::EmergencyBrake) {
 		leftMotorSpeed = 0.0f;
 		rightMotorSpeed = 0.0f;
+		lastLeftMotorSpeed = 0.0f;
+		lastRightMotorSpeed = 0.0f;
 		return;
 	}
 
@@ -48,6 +50,8 @@ void MapRemoteToMotorSpeed(int16_t remoteX, int16_t remoteY, float &leftMotorSpe
 	if (remoteX == 0 && remoteY == 0) {
 		leftMotorSpeed = 0.0f;
 		rightMotorSpeed = 0.0f;
+		lastLeftMotorSpeed = 0.0f;
+		lastRightMotorSpeed = 0.0f;
 		return;
 	}
 
@@ -66,6 +70,8 @@ void MapRemoteToMotorSpeed(int16_t remoteX, int16_t remoteY, float &leftMotorSpe
 	if (magnitude < MIN_INPUT_THRESHOLD) {
 		leftMotorSpeed = 0.0f;
 		rightMotorSpeed = 0.0f;
+		lastLeftMotorSpeed = 0.0f;
+		lastRightMotorSpeed = 0.0f;
 		return;
 	}
 

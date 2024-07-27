@@ -207,8 +207,8 @@ clean:
 #######################################
 # download
 #######################################
-CONFIG_FILE = D:\CLI-Tools\openocd\share\openocd\scripts\interface\cmsis-dap-swd.cfg
-TARGET_FILE = D:\CLI-Tools\openocd\share\openocd\scripts\target\stm32f4x.cfg
+CONFIG_FILE = interface/cmsis-dap-swd.cfg
+TARGET_FILE = target/stm32f4x.cfg
 
 download:
 	-openocd -f $(CONFIG_FILE) -f $(TARGET_FILE) -c init -c "reset halt; wait_halt; flash write_image erase $(BUILD_DIR)/$(TARGET).hex" -c reset -c shutdown
