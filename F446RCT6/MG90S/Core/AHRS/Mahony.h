@@ -11,5 +11,5 @@
  * @param[in] gyro 角加速度 (rad/s)
  * @param[in] mag 磁场大小 (uT)
  */
-void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
-	Gyro_Data_t *gyro, Mag_Data_t *mag);
+void Mahony_AHRS_Update(float quat[4], float sample_time, AccelData *accel,
+	GyroData *gyro, MagData *mag);

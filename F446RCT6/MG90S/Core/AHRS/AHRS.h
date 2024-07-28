@@ -1,9 +1,15 @@
 #pragma once
 
 #include "main.h"
+#include <array>
 #include <cmath>
 #include <type_traits>
 #include <functional>
+
+constexpr float Gx_OFFSET = 0.00055712f;
+constexpr float Gy_OFFSET = -0.0056608f;
+constexpr float Gz_OFFSET = -0.0009765f;
+constexpr float GRAVITY_NORM = 9.82609f;
 
 /**
  * @brief 检查浮点数是否为 NaN（非数字）或无穷大
@@ -76,9 +82,9 @@ struct EulerData {
  */
 class AHRS {
 public:
-	using AHRSCalculateFunc = std::function<void(float quat[4], float sample_time, AccelData *, GyroData *, MagData *)>;
-	using GetIMUFunc = std::function<void(void *, AccelData *, GyroData *)>;
-	using GetMagFunc = std::function<void(void *, MagData *)>;
+	using AHRSCalculateFunc = std::function<void(std::array<float, 4> quat, float sample_time, AccelData &, GyroData &, MagData &)>;
+	using GetIMUFunc = std::function<void(void *, AccelData &, GyroData &)>;
+	using GetMagFunc = std::function<void(void *, MagData &)>;
 
 	/**
 	 * @brief 构造函数
@@ -92,13 +98,13 @@ public:
 	explicit AHRS(float sample_time, AHRSCalculateFunc ahrs_calculate_func, GetIMUFunc get_imu_func, void *imu_handle, GetMagFunc get_mag_func, void *mag_handle);
 
 	/**
-	 * @brief 矫正角速度零飘
+	 * @brief 校准IMU偏移
 	 * @return 函数执行状态
-	 *  - HAL_OK 矫正成功
-	 *  - HAL_TIMEOUT 矫正超时
-	 *  - HAL_ERROR 矫正失败(IMU数据异常)
+	 *  - HAL_OK 校准成功
+	 *  - HAL_TIMEOUT 校准超时
+	 *  - HAL_ERROR 校准失败(IMU数据异常)
 	 */
-	HAL_StatusTypeDef CalibrateIMUOffset();
+	HAL_StatusTypeDef CalibrateIMU();
 
 	/**
 	 * @brief 更新AHRS数据
@@ -141,7 +147,7 @@ public:
 	 * @brief 获取四元数数据
 	 * @return 四元数数据数组
 	 */
-	const float *GetQuat() const {
+	const std::array<float, 4> GetQuat() const {
 		return _quat;
 	}
 
@@ -149,18 +155,18 @@ public:
 	 * @brief 获取标定时的重力加速度
 	 * @return 重力加速度
 	 */
-	float GetGNorm() const {
-		return _g_norm;
+	float GetGravityNorm() const {
+		return _gravity_norm;
 	}
 
 private:
-	EulerData _euler_angle;
-	AccelData _accel;
-	AccelData _real_accel;
-	GyroData _gyro;
-	MagData _mag;
-	float _quat[4];
-	float _g_norm;
+	EulerData _euler_angle{};
+	AccelData _accel{};
+	AccelData _real_accel{};
+	GyroData _gyro{};
+	MagData _mag{};
+	std::array<float, 4> _quat{};
+	float _gravity_norm;
 	float _sample_time;
 	GyroData _gyro_offset;
 	AHRSCalculateFunc _ahrs_calculate_func;
@@ -170,8 +176,8 @@ private:
 	GetMagFunc _get_mag_func;
 	uint8_t _count;
 
-	HAL_StatusTypeDef CalibrateIMUOffsetErrorHandle();
-	void GetAngle(const float quat[4], EulerData *euler_angle);
-	void EarthFrameToBodyFrame(const RectangularCoordinate &vecEF, RectangularCoordinate *vecBF, const float q[4]);
-	void BodyFrameToEarthFrame(const RectangularCoordinate &vecBF, RectangularCoordinate *vecEF, const float q[4]);
+	HAL_StatusTypeDef HandleIMUCalibrationError();
+	void CalculateEulerAngles();
+	void ConvertToBodyFrame(const RectangularCoordinate &vecEF, RectangularCoordinate &vecBF);
+	void ConvertToEarthFrame(const RectangularCoordinate &vecBF, RectangularCoordinate &vecEF);
 };

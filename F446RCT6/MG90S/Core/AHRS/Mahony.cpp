@@ -10,12 +10,12 @@ const float twoKi = twoKiDef * 1; // 2 * integral gain (Ki)
 static float integralFBx = 0.0f, integralFBy = 0.0f, integralFBz = 0.0f; // integral error terms scaled by Ki
 
 
-void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
-	Gyro_Data_t *gyro, Mag_Data_t *mag) {
+void Mahony_AHRS_Update(float quat[4], float sample_time, AccelData *accel,
+	GyroData *gyro, MagData *mag) {
 	// 将传入的加速度计、角速度计和磁力计数据结构解引用，做局部副本
-	Accel_Data_t accel_ = *accel;
-	Gyro_Data_t gyro_ = *gyro;
-	Mag_Data_t mag_ = *mag;
+	auto accel_ = *accel;
+	auto gyro_ = *gyro;
+	auto mag_ = *mag;
 
 	// 定义一些局部变量用于后续计算
 	float accelInvNorm, accel_norm;
@@ -27,14 +27,14 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 	float qa, qb, qc;
 
 	// 只在角速度计数据有效时才进行运算
-	if (is_nan_or_inf(gyro_.x) || is_nan_or_inf(gyro_.y) || is_nan_or_inf(gyro_.z)) {
+	if (IsNanOrInf(gyro_.x) || IsNanOrInf(gyro_.y) || IsNanOrInf(gyro_.z)) {
 		return;
 	}
 
 	// 只在加速度计数据有效时才进行运算
 	if (accel != NULL) {
-		if (!(is_nan_or_inf(accel_.x) || is_nan_or_inf(accel_.y) ||
-			is_nan_or_inf(accel_.z)) &&
+		if (!(IsNanOrInf(accel_.x) || IsNanOrInf(accel_.y) ||
+			IsNanOrInf(accel_.z)) &&
 			(accel_.x != 0 || accel_.y != 0 || accel_.z != 0)) {
 
 			// 四元数各分量的平方和乘积
@@ -50,7 +50,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 			q3q3 = quat[3] * quat[3];
 
 			// 将加速度计得到的实际重力加速度向量v单位化
-			accelInvNorm = invsqrt(accel_.x * accel_.x + accel_.y * accel_.y +
+			accelInvNorm = InvSqrt(accel_.x * accel_.x + accel_.y * accel_.y +
 				accel_.z * accel_.z);
 			accel_.x *= accelInvNorm;
 			accel_.y *= accelInvNorm;
@@ -63,11 +63,11 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 			// 只在磁力计数据有效时才进行运算
 			if (mag != NULL)
 				if ((mag_.x != 0.0f || mag_.y != 0.0f || mag_.z != 0.0f) &&
-					!(is_nan_or_inf(mag_.x) || is_nan_or_inf(mag_.y) || is_nan_or_inf(mag_.z))) {
+					!(IsNanOrInf(mag_.x) || IsNanOrInf(mag_.y) || IsNanOrInf(mag_.z))) {
 
 					// 将磁力计得到的实际磁场向量m单位化
 					mamInvNorm =
-						invsqrt(mag_.x * mag_.x + mag_.y * mag_.y + mag_.z * mag_.z);
+						InvSqrt(mag_.x * mag_.x + mag_.y * mag_.y + mag_.z * mag_.z);
 					mag_.x *= mamInvNorm;
 					mag_.y *= mamInvNorm;
 					mag_.z *= mamInvNorm;
@@ -91,7 +91,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 			accel_norm = 1 / accelInvNorm;
 
 			// 加速度和标定时候的重力加速度的差别过大,认为加速度不可信.
-			if (accel_norm > g_norm - 0.05 && accel_norm < g_norm + 0.05) {
+			if (accel_norm > GRAVITY_NORM - 0.05 && accel_norm < GRAVITY_NORM + 0.05) {
 				// 通过向量外积得到重力加速度向量和地磁向量的实际值与测量值之间误差
 				halfex = (accel_.y * halfvz - accel_.z * halfvy) +
 					(mag_.y * halfwz - mag_.z * halfwy);
@@ -139,7 +139,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 	quat[3] += (+qa * gyro_.z + qb * gyro_.y - qc * gyro_.x);
 
 	// 单位化四元数 保证四元数在迭代过程中保持单位性质
-	accelInvNorm = invsqrt(quat[0] * quat[0] + quat[1] * quat[1] +
+	accelInvNorm = InvSqrt(quat[0] * quat[0] + quat[1] * quat[1] +
 		quat[2] * quat[2] + quat[3] * quat[3]);
 	quat[0] *= accelInvNorm;
 	quat[1] *= accelInvNorm;
