@@ -3,11 +3,11 @@
 #include "can.h"
 
 // 定义反馈信息的ID基础值
-#define FEEDBACK_ID_BASE 0x201
+#define FEEDBACK_ID_BASE 0x201u
 // 定义CAN控制ID的基础值
-#define CAN_CONTROL_ID_BASE 0x200
+#define CAN_CONTROL_ID_BASE 0x200u
 // 定义CAN控制ID的扩展值
-#define CAN_CONTROL_ID_EXTEND 0x1ff
+#define CAN_CONTROL_ID_EXTEND 0x1ffu
 // 定义电机的最大数量
 #define MOTOR_MAX_NUM 7
 
