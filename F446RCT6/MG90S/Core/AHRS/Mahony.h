@@ -1,5 +1,4 @@
-#ifndef __MAHONY_H
-#define __MAHONT_H
+#pragma once
 
 #include "AHRS.h"
 
@@ -14,6 +13,3 @@
  */
 void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 	Gyro_Data_t *gyro, Mag_Data_t *mag);
-
-
-#endif

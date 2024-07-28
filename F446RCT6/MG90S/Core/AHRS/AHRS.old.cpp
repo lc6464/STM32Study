@@ -1,4 +1,4 @@
-#include "AHRS.h"
+#include "AHRS.old.h"
 
 #define GxOFFSET 0.00055712f
 #define GyOFFSET -0.0056608f
@@ -104,26 +104,26 @@ HAL_StatusTypeDef Calibrate_IMU_Offset(AHRS_t *AHRS) {
 			AHRS->Get_IMU_fun(AHRS->IMU_handle, &AHRS->accel, &AHRS->gyro);
 
 			// 检查数据是否有效，如果数据无效则进行错误处理
-			if (IS_NAN_INF(AHRS->accel.x) || IS_NAN_INF(AHRS->accel.y) ||
-				IS_NAN_INF(AHRS->accel.z)) {
+			if (is_nan_or_inf(AHRS->accel.x) || is_nan_or_inf(AHRS->accel.y) ||
+				is_nan_or_inf(AHRS->accel.z)) {
 				return Calibrate_IMU_Offset_Error_Handle(AHRS);
 			}
 
-			if (IS_NAN_INF(AHRS->gyro.x) || IS_NAN_INF(AHRS->gyro.y) ||
-				IS_NAN_INF(AHRS->gyro.z)) {
+			if (is_nan_or_inf(AHRS->gyro.x) || is_nan_or_inf(AHRS->gyro.y) ||
+				is_nan_or_inf(AHRS->gyro.z)) {
 				return Calibrate_IMU_Offset_Error_Handle(AHRS);
 			}
 
 			// 计算加速度的规范
-			gNormTemp = math_sqrt(AHRS->accel.x * AHRS->accel.x +
+			gNormTemp = std::sqrt(AHRS->accel.x * AHRS->accel.x +
 				AHRS->accel.y * AHRS->accel.y +
 				AHRS->accel.z * AHRS->accel.z);
 
 			// 如果校准数据异常，舍弃本次数据，重新读取
-			if (i != 0 && (abs(AHRS->g_norm - gNormTemp) > 0.5f ||
-				abs(AHRS->gyro_offset.x - AHRS->gyro.x) > 0.05f ||
-				abs(AHRS->gyro_offset.y - AHRS->gyro.y) > 0.05f ||
-				abs(AHRS->gyro_offset.z - AHRS->gyro.z) > 0.05f)) {
+			if (i != 0 && (std::abs(AHRS->g_norm - gNormTemp) > 0.5f ||
+				std::abs(AHRS->gyro_offset.x - AHRS->gyro.x) > 0.05f ||
+				std::abs(AHRS->gyro_offset.y - AHRS->gyro.y) > 0.05f ||
+				std::abs(AHRS->gyro_offset.z - AHRS->gyro.z) > 0.05f)) {
 				i--;
 				error_count++;
 				// 如果错误计数过多，重新校准
@@ -155,39 +155,44 @@ HAL_StatusTypeDef Calibrate_IMU_Offset(AHRS_t *AHRS) {
 	// 错误处理
 }
 
-//#include "../../math/math_filter.h"
 /**
  * @brief 更新AHRS数据
  * @param[in,out] AHRS AHRS句柄
  */
 void AHRS_Update(AHRS_t *AHRS) {
 	// 获取数据
-	if (AHRS->Get_IMU_fun != NULL)
+	if (AHRS->Get_IMU_fun != NULL) {
 		AHRS->Get_IMU_fun(AHRS->IMU_handle, &AHRS->accel, &AHRS->gyro);
-	if (AHRS->Get_Mag_fun != NULL)
+	}
+
+	if (AHRS->Get_Mag_fun != NULL) {
 		AHRS->Get_Mag_fun(AHRS->mag_handle, &AHRS->mag);
-	else {
+	} else {
 		AHRS->mag.x = 0.0f;
 		AHRS->mag.y = 0.0f;
 		AHRS->mag.z = 0.0f;
 	}
+
 	// 矫正零飘
 	AHRS->gyro.x -= AHRS->gyro_offset.x;
 	AHRS->gyro.y -= AHRS->gyro_offset.y;
 	AHRS->gyro.z -= AHRS->gyro_offset.z;
+
 	// 数据融合
 	g_norm = AHRS->g_norm;
 	AHRS->AHRS_Calculate_fun(AHRS->quat, AHRS->sample_time, &AHRS->accel,
 		&AHRS->gyro, &AHRS->mag);
+
 	// 转换为欧拉角
 	AHRS_Get_Angle(AHRS->quat, &AHRS->euler_angle);
+
 	// 转换为机体加速度
 	static Accel_Data_t real_accel;
 	BodyFrameToEarthFrame(AHRS->accel, &real_accel, AHRS->quat);
 	real_accel.z -= AHRS->g_norm;
-	AHRS->real_accel.x = Lowpass(real_accel.x, AHRS->real_accel.x, 0.6);
-	AHRS->real_accel.y = Lowpass(real_accel.y, AHRS->real_accel.y, 0.6);
-	AHRS->real_accel.z = Lowpass(real_accel.z, AHRS->real_accel.z, 0.6);
+	AHRS->real_accel.x = low_pass_filter(real_accel.x, AHRS->real_accel.x, 0.6);
+	AHRS->real_accel.y = low_pass_filter(real_accel.y, AHRS->real_accel.y, 0.6);
+	AHRS->real_accel.z = low_pass_filter(real_accel.z, AHRS->real_accel.z, 0.6);
 }
 
 /**
@@ -197,10 +202,10 @@ void AHRS_Update(AHRS_t *AHRS) {
  */
 void AHRS_Get_Angle(const float quat[4], Euler_Data_t *euler_angle) {
 	euler_angle->yaw =
-		math_atan2(2.0f * (quat[0] * quat[3] + quat[1] * quat[2]),
+		std::atan2(2.0f * (quat[0] * quat[3] + quat[1] * quat[2]),
 			2.0f * (quat[0] * quat[0] + quat[1] * quat[1]) - 1.0f);
 	euler_angle->pitch =
-		math_atan2(2.0f * (quat[0] * quat[1] + quat[2] * quat[3]),
+		std::atan2(2.0f * (quat[0] * quat[1] + quat[2] * quat[3]),
 			2.0f * (quat[0] * quat[0] + quat[3] * quat[3]) - 1.0f);
 	euler_angle->roll = asinf(-2.0f * (quat[1] * quat[3] - quat[0] * quat[2]));
 }

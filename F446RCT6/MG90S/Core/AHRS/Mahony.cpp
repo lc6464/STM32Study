@@ -4,24 +4,10 @@
 #define twoKiDef (2.0f * 0.0f) // 2 * integral gain
 
 const float twoKp = twoKpDef * 8; // 2 * proportional gain (Kp)
-const float twoKi =
-twoKiDef * 1; // 2 * integral gain (Ki)
-// // quaternion of sensor frame relative to auxiliary frame
-float integralFBx = 0.0f, integralFBy = 0.0f,
-integralFBz = 0.0f; // integral error terms scaled by Ki
-#ifndef _MATH_COMMON_H_
-#define IS_NAN_INF(x) (!isnan(x) || !isinf(x))
-static float math_invsqrt(float x) {
-	float halfx = 0.5f * x;
-	float y = x;
-	long i = *(long *)&y;
-	i = 0x5f375a86 - (i >> 1);
-	y = *(float *)&i;
-	y = y * (1.5f - (halfx * y * y));
-	return y;
-}
-static float math_sqrt(float x) { return 1 / math_invsqrt(x); }
-#endif
+const float twoKi = twoKiDef * 1; // 2 * integral gain (Ki)
+
+// quaternion of sensor frame relative to auxiliary frame
+static float integralFBx = 0.0f, integralFBy = 0.0f, integralFBz = 0.0f; // integral error terms scaled by Ki
 
 
 void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
@@ -41,13 +27,14 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 	float qa, qb, qc;
 
 	// 只在角速度计数据有效时才进行运算
-	if (IS_NAN_INF(gyro_.x) || IS_NAN_INF(gyro_.y) || IS_NAN_INF(gyro_.z))
+	if (is_nan_or_inf(gyro_.x) || is_nan_or_inf(gyro_.y) || is_nan_or_inf(gyro_.z)) {
 		return;
+	}
 
 	// 只在加速度计数据有效时才进行运算
-	if (accel != NULL)
-		if (!(IS_NAN_INF(accel_.x) || IS_NAN_INF(accel_.y) ||
-			IS_NAN_INF(accel_.z)) &&
+	if (accel != NULL) {
+		if (!(is_nan_or_inf(accel_.x) || is_nan_or_inf(accel_.y) ||
+			is_nan_or_inf(accel_.z)) &&
 			(accel_.x != 0 || accel_.y != 0 || accel_.z != 0)) {
 
 			// 四元数各分量的平方和乘积
@@ -63,7 +50,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 			q3q3 = quat[3] * quat[3];
 
 			// 将加速度计得到的实际重力加速度向量v单位化
-			accelInvNorm = math_invsqrt(accel_.x * accel_.x + accel_.y * accel_.y +
+			accelInvNorm = invsqrt(accel_.x * accel_.x + accel_.y * accel_.y +
 				accel_.z * accel_.z);
 			accel_.x *= accelInvNorm;
 			accel_.y *= accelInvNorm;
@@ -76,11 +63,11 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 			// 只在磁力计数据有效时才进行运算
 			if (mag != NULL)
 				if ((mag_.x != 0.0f || mag_.y != 0.0f || mag_.z != 0.0f) &&
-					!(IS_NAN_INF(mag_.x) || IS_NAN_INF(mag_.y) || IS_NAN_INF(mag_.z))) {
+					!(is_nan_or_inf(mag_.x) || is_nan_or_inf(mag_.y) || is_nan_or_inf(mag_.z))) {
 
 					// 将磁力计得到的实际磁场向量m单位化
 					mamInvNorm =
-						math_invsqrt(mag_.x * mag_.x + mag_.y * mag_.y + mag_.z * mag_.z);
+						invsqrt(mag_.x * mag_.x + mag_.y * mag_.y + mag_.z * mag_.z);
 					mag_.x *= mamInvNorm;
 					mag_.y *= mamInvNorm;
 					mag_.z *= mamInvNorm;
@@ -90,7 +77,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 						mag_.z * (q1q3 + q0q2));
 					hy = 2.0f * (mag_.x * (q1q2 + q0q3) + mag_.y * (0.5f - q1q1 - q3q3) +
 						mag_.z * (q2q3 - q0q1));
-					bx = math_sqrt(hx * hx + hy * hy);
+					bx = std::sqrt(hx * hx + hy * hy);
 					bz = 2.0f * (mag_.x * (q1q3 - q0q2) + mag_.y * (q2q3 + q0q1) +
 						mag_.z * (0.5f - q1q1 - q2q2));
 
@@ -137,6 +124,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 				gyro_.z += twoKp * halfez;
 			}
 		}
+	}
 
 	// 微分方程迭代求解，更新四元数
 	gyro_.x *= 0.5f * sample_time; // 预乘公共因子
@@ -151,7 +139,7 @@ void Mahony_AHRS_Update(float quat[4], float sample_time, Accel_Data_t *accel,
 	quat[3] += (+qa * gyro_.z + qb * gyro_.y - qc * gyro_.x);
 
 	// 单位化四元数 保证四元数在迭代过程中保持单位性质
-	accelInvNorm = math_invsqrt(quat[0] * quat[0] + quat[1] * quat[1] +
+	accelInvNorm = invsqrt(quat[0] * quat[0] + quat[1] * quat[1] +
 		quat[2] * quat[2] + quat[3] * quat[3]);
 	quat[0] *= accelInvNorm;
 	quat[1] *= accelInvNorm;
