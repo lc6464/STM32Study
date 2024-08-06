@@ -18,7 +18,7 @@ void RemoteControl::Stop() {
 }
 
 void RemoteControl::Reset() {
-	_controllerData = { 1024, 1024, 1024, 1024, SwitchPosition::Unknown, SwitchPosition::Unknown, 1024 };
+	_controllerData = { 0, 0, 0, 0, SwitchPosition::Unknown, SwitchPosition::Unknown, 0 };
 	_status = Status::Unknown;
 }
 
@@ -36,8 +36,8 @@ bool RemoteControl::RxCallback(const UART_HandleTypeDef *huart) {
 	return true;
 }
 
-void RemoteControl::Tick() {
-	_watchDog.Tick(_status != Status::Stopped && _status != Status::Unknown);
+bool RemoteControl::Tick() {
+	return _watchDog.Tick(_status != Status::Stopped && _status != Status::Unknown);
 }
 
 std::optional<RemoteControl::ControllerData> RemoteControl::GetControllerData() const {
@@ -48,15 +48,15 @@ std::optional<RemoteControl::ControllerData> RemoteControl::GetControllerData() 
 }
 
 void RemoteControl::RxTimeoutCallback() {
-	Reset();
 	Stop();
+	Reset();
 	Start();
 	_status = Status::Timeout;
 }
 
 bool RemoteControl::RxCallbackErrorHandler() {
-	Reset();
 	Stop();
+	Reset();
 	Start();
 	_status = Status::Error;
 	return false;

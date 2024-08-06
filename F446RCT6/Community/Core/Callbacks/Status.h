@@ -3,10 +3,11 @@
 #include <cstring>
 
 enum class SystemStatus {
-	Stopped,
-	Running,
-	EmergencyBrake,
-	Error
+	Stopped,               // 停止
+	RunningAsOneStick,     // 右杆 XY 控制
+	RunningAsDualStick,    // 双杆 Y 控制
+	EmergencyBrake,        // 紧急制动
+	Error                  // 错误状态（如遥控器离线）
 };
 
 enum class SpeedMode {
@@ -25,8 +26,11 @@ inline void SystemStatusToString(SystemStatus status, char *buffer) {
 	case SystemStatus::Stopped:
 		strcpy(buffer, "Stop");
 		break;
-	case SystemStatus::Running:
-		strcpy(buffer, "Run");
+	case SystemStatus::RunningAsOneStick:
+		strcpy(buffer, "1 Stick");
+		break;
+	case SystemStatus::RunningAsDualStick:
+		strcpy(buffer, "2 Stick");
 		break;
 	case SystemStatus::EmergencyBrake:
 		strcpy(buffer, "EB");

@@ -90,10 +90,11 @@ add_custom_target(download
     COMMENT "Downloading ${PROJECT_NAME}.hex to target using OpenOCD"
 )
 
-# 查找所有的 .c 和 .cpp 文件
+# 查找所有的 .c、.cpp 和 .s 文件
 file(GLOB_RECURSE ADDITIONAL_SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/Core/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Core/*.s"
 )
 
 # 查找所有包含 .h 和 .hpp 文件的目录
@@ -108,7 +109,7 @@ foreach(HEADER ${HEADER_FILES})
 endforeach()
 list(REMOVE_DUPLICATES ADDITIONAL_INCLUDE_DIRS)
 
-# 打印找到的源文件和包含目录（可选，用于调试）
+# 打印找到的源文件和包含目录（用于调试）
 message(STATUS "Found additional source files: ${ADDITIONAL_SOURCE_FILES}")
 message(STATUS "Found additional include directories: ${ADDITIONAL_INCLUDE_DIRS}")
 

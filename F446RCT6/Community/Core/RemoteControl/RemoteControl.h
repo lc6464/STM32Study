@@ -24,10 +24,10 @@ public:
 	 * @brief 遥控器拨杆位置
 	 */
 	enum class SwitchPosition {
+		Unknown = 0,
 		Up = 1,
 		Middle = 3,
-		Down = 2,
-		Unknown = 0
+		Down = 2
 	};
 
 	/**
@@ -68,8 +68,9 @@ public:
 
 	/**
 	 * @brief 看门狗函数，检查是否超时
+	 * @return 是否超时
 	 */
-	void Tick();
+	bool Tick();
 
 	/**
 	 * @brief 获取当前遥控器状态

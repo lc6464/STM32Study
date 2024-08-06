@@ -16,7 +16,7 @@ void WatchDog::Feed(bool isFeed/* = true*/) {
 	}
 }
 
-void WatchDog::Tick(bool isTick/* = true*/) {
+bool WatchDog::Tick(bool isTick/* = true*/) {
 	if (_isEnabled && isTick) {
 		uint32_t currentTime = _getCurrentTime();
 		if (currentTime - _lastTime >= _timeout) {
@@ -24,8 +24,10 @@ void WatchDog::Tick(bool isTick/* = true*/) {
 				_timeoutCallback();
 			}
 			_lastTime = currentTime;  // 重置上次喂狗时间
+			return true;
 		}
 	}
+	return false;
 }
 
 void WatchDog::Enable() {

@@ -55,11 +55,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		rightMotor.SetVoltage(static_cast<int16_t>(rightResult));
 
 		// 发送电机速度反馈
-		auto mailbox = Mailboxes::Create();
-		auto sent_result = community.SendSpeed(0x004, mailbox, leftSpeed, rightSpeed);
-		UNUSED(sent_result); // for debug
+		// auto mailbox = Mailboxes::Create();
+		uint32_t mailbox = 0; // 关掉自动重传后试试
+		auto sent_result = community.SendSpeed(0x004, &mailbox, leftSpeed, rightSpeed);
 
-		if (systemStatus == Status::Error) {
+		if (sent_result != HAL_OK) {
+			// 发送失败，灯亮
+			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+		} else if (systemStatus == Status::Error) {
 			// 错误，灯灭
 			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 		} else {

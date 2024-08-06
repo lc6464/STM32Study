@@ -22,8 +22,9 @@ public:
 	/**
 	 * @brief 看门狗计时
 	 * @param isTick 是否计时
+	 * @return 是否超时
 	 */
-	void Tick(bool isTick = true);
+	bool Tick(bool isTick = true);
 
 	// 启用看门狗
 	void Enable();
