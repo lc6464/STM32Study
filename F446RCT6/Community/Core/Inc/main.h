@@ -65,6 +65,13 @@ void SystemClock_Config(void);
 #define LED_G_GPIO_Port GPIOC
 #define LED_B_Pin GPIO_PIN_15
 #define LED_B_GPIO_Port GPIOC
+#define Wireless_SET_Pin GPIO_PIN_6
+#define Wireless_SET_GPIO_Port GPIOA
+#define Wireless_VCC_Pin GPIO_PIN_7
+#define Wireless_VCC_GPIO_Port GPIOA
+#define Key1_Pin GPIO_PIN_7
+#define Key1_GPIO_Port GPIOB
+#define Key1_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
