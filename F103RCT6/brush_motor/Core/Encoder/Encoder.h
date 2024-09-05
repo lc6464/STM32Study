@@ -60,8 +60,8 @@ public:
 
 private:
 	static constexpr float FILTER_ALPHA = 0.3f;  // 低通滤波器系数
-	static constexpr float PULSES_PER_REVOLUTION = 11.0f * 4.0f;  // 每转脉冲数，考虑正交编码器系数 4
-	static constexpr float GEAR_RATIO = 9.6f;  // 减速比
+	static constexpr float PULSES_PER_REVOLUTION = 13.0f * 4.0f;  // 每转脉冲数，考虑正交编码器系数 4
+	static constexpr float GEAR_RATIO = 28.0f;  // 减速比
 
 	TIM_HandleTypeDef *_htim;     // 定时器句柄指针
 	uint16_t _lastCount;          // 上一次的计数值，实际不会超过 65535

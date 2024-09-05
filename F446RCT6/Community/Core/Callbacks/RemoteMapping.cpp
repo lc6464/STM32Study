@@ -10,8 +10,8 @@ constexpr float MIN_INPUT_THRESHOLD = 20.0f; // 最小输入阈值
 constexpr float SMOOTH_FACTOR = 0.75f; // 平滑因子
 
 // 定义低速和高速的最大速度
-constexpr float LOW_SPEED_MAX = 300.0f;
-constexpr float HIGH_SPEED_MAX = 450.0f;
+constexpr float LOW_SPEED_MAX = 200.0f;
+constexpr float HIGH_SPEED_MAX = 300.0f;
 
 // 声明上一次的电机速度为静态变量
 static float lastLeftMotorSpeed = 0.0f;
@@ -33,11 +33,11 @@ bool MapRightStickToMotorSpeed(int16_t rightX, int16_t rightY, float &leftMotorS
 	// 计算遥控器输入的模长
 	const float magnitude = std::sqrt(rightX * rightX + rightY * rightY);
 
-	// 如果输入太小，按 0.9 的滤波系数平滑过渡到 0
+	// 如果输入太小，按 0.4 的滤波系数平滑过渡到 0
 	if (magnitude < MIN_INPUT_THRESHOLD) {
 		// 应用平滑过渡
-		leftMotorSpeed = lastLeftMotorSpeed * 0.1;
-		rightMotorSpeed = lastRightMotorSpeed * 0.1;
+		leftMotorSpeed = lastLeftMotorSpeed * 0.6;
+		rightMotorSpeed = lastRightMotorSpeed * 0.6;
 
 		// 更新上一次的速度
 		lastLeftMotorSpeed = leftMotorSpeed;
@@ -127,8 +127,8 @@ bool MapDualStickToMotorSpeed(int16_t leftY, int16_t rightY, float &leftMotorSpe
 
 	// 映射左右遥控器输入到电机速度
 	if (std::abs(leftY) < MIN_INPUT_THRESHOLD && std::abs(rightY) < MIN_INPUT_THRESHOLD) {
-		leftMotorSpeed = lastLeftMotorSpeed * 0.1;
-		rightMotorSpeed = lastRightMotorSpeed * 0.1;
+		leftMotorSpeed = lastLeftMotorSpeed * 0.6;
+		rightMotorSpeed = lastRightMotorSpeed * 0.6;
 
 		lastLeftMotorSpeed = leftMotorSpeed;
 		lastRightMotorSpeed = rightMotorSpeed;
@@ -158,15 +158,15 @@ void MapRemoteToMotorSpeed(RemoteControl::ControllerData controllerData, float &
 		return; // 结束函数
 	}
 
-	// Stop 模式下缓慢停止 或 遥控器输入为 0，按 0.9 的滤波系数平滑过渡到 0
+	// Stop 模式下缓慢停止 或 遥控器输入为 0，按 0.4 的滤波系数平滑过渡到 0
 	if (
 		mode == SpeedMode::Off
 		|| (status == SystemStatus::RunningAsOneStick && controllerData.RightStickX == 0 && controllerData.RightStickY == 0)
 		|| (status == SystemStatus::RunningAsDualStick && controllerData.LeftStickY == 0 && controllerData.RightStickY == 0)
 		) {
 		// 应用平滑过渡
-		leftMotorSpeed = lastLeftMotorSpeed * 0.1;
-		rightMotorSpeed = lastRightMotorSpeed * 0.1;
+		leftMotorSpeed = lastLeftMotorSpeed * 0.6;
+		rightMotorSpeed = lastRightMotorSpeed * 0.6;
 
 		// 更新上一次的速度
 		lastLeftMotorSpeed = leftMotorSpeed;
