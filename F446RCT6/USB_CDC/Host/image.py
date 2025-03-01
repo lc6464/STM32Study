@@ -5,8 +5,9 @@ import sys
 
 def select_serial_port():
     # 尝试自动检测STM32虚拟串口
-    stm32_ports = [port for port in list_ports.comports() if 'STM32 Virtual ComPort' in port.description]
-    if stm32_ports:
+    stm32_ports = [port for port in list_ports.comports() if 'USB VID:PID=0483:5740' in port.hwid]
+    if len(stm32_ports) == 1:
+        print(f"检测到STM32虚拟串口：{stm32_ports[0].device}")
         return stm32_ports[0].device
 
     # 交互式选择串口
@@ -25,7 +26,7 @@ def process_image(image_path):
     # 图像处理流水线
     img = Image.open(image_path)
     img = ImageOps.fit(img, (128, 64), method=Image.Resampling.LANCZOS)
-    img = img.convert('1')  # 直接转换为1位模式
+    img = img.convert('1', dither=Image.Dither.FLOYDSTEINBERG)  # 直接转换为1位模式
 
     # 生成显示缓冲区
     display_buffer = bytearray(1024)
@@ -92,7 +93,7 @@ def verify_data(ser, packet):
 def main():
     # 初始化串口
     port = select_serial_port()
-    with serial.Serial(port, baudrate=115200, timeout=1) as ser:
+    with serial.Serial(port, baudrate=256000, timeout=1) as ser:
         print(f"已连接串口：{port}")
 
         while True:
