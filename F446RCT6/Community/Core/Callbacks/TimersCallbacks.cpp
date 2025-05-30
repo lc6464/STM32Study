@@ -38,14 +38,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		UNUSED(sent_result); // for debug
 
 		// 串口发送数据
-		if (!isWirelessUARTModuleBeingConfigured) {
-			uint8_t txData[16] = { 0 };
-			*reinterpret_cast<float *>(txData) = leftTarget;
-			*reinterpret_cast<float *>(txData + 4) = rightTarget;
-			*reinterpret_cast<float *>(txData + 8) = leftSpeed;
-			*reinterpret_cast<float *>(txData + 12) = rightSpeed;
-			HAL_UART_Transmit_DMA(&huart1, txData, sizeof(txData));
-		}
+		// if (!isWirelessUARTModuleBeingConfigured) {
+		uint8_t txData[16] = { 0 };
+		*reinterpret_cast<float *>(txData) = leftTarget;
+		*reinterpret_cast<float *>(txData + 4) = rightTarget;
+		*reinterpret_cast<float *>(txData + 8) = leftSpeed;
+		*reinterpret_cast<float *>(txData + 12) = rightSpeed;
+		HAL_UART_Transmit_DMA(&huart1, txData, sizeof(txData));
+		// }
 
 		// 更新屏幕
 		char buffer[8] = { 0 };

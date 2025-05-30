@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>RPM 数据解算器</title>
+	<link rel="stylesheet" href="style.css">
+	<script type="module" src="script.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<h1>电机 RPM 数据</h1>
+		<button id="connectSerialBtn">连接串口</button>
+		<p id="statusMessage">状态：等待连接...</p>
+
+		<div class="data-grid">
+			<div class="data-item">
+				<span class="label">左轮目标 RPM:</span>
+				<span id="leftTargetRPM" class="value">---</span>
+			</div>
+			<div class="data-item">
+				<span class="label">右轮目标 RPM:</span>
+				<span id="rightTargetRPM" class="value">---</span>
+			</div>
+			<div class="data-item">
+				<span class="label">左轮实际 RPM:</span>
+				<span id="leftSpeedRPM" class="value">---</span>
+			</div>
+			<div class="data-item">
+				<span class="label">右轮实际 RPM:</span>
+				<span id="rightSpeedRPM" class="value">---</span>
+			</div>
+		</div>
+		<div class="stats">
+			<p>有效数据包: <span id="validPackets">0</span></p>
+			<p>无效数据包: <span id="invalidPackets">0</span></p>
+		</div>
+
+		<div class="test-controls">
+			<h2>测试数据发送</h2>
+			<button id="sendTestDataBtn">发送模拟数据</button>
+			<p class="small-note">此按钮用于模拟从串口接收16字节数据以测试UI。</p>
+		</div>
+	</div>
+
+</body>
+
+</html>
