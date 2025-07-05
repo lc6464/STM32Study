@@ -18,21 +18,27 @@ int main(void) {
 
 	MX_GPIO_Init();
 	MX_TIM1_Init();
+	MX_TIM2_Init();
 	MX_TIM3_Init();
-	MX_TIM6_Init();
+	MX_TIM4_Init();
 	MX_TIM5_Init();
+	MX_TIM6_Init();
+	MX_TIM7_Init();
 	MX_TIM8_Init();
 	MX_CAN_Init();
-	MX_TIM7_Init();
 
 	community.Start();
 	systemWatchDog.Enable();
 
-	leftEncoder.Start();
-	rightEncoder.Start();
+	leftFrontEncoder.Start();
+	rightFrontEncoder.Start();
+	leftBackEncoder.Start();
+	rightBackEncoder.Start();
 
-	leftMotor.Start();
-	rightMotor.Start();
+	leftFrontMotor.Start();
+	rightFrontMotor.Start();
+	leftBackMotor.Start();
+	rightBackMotor.Start();
 
 	HAL_TIM_Base_Start_IT(&htim6);
 	HAL_TIM_Base_Start_IT(&htim7);
@@ -48,13 +54,8 @@ int main(void) {
  */
 void SystemClock_Config(void) {
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers" // 这段代码由 CubeMX 自动生成，不做出修改
-
-	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
-
-#pragma GCC diagnostic pop
+	RCC_OscInitTypeDef RCC_OscInitStruct{};
+	RCC_ClkInitTypeDef RCC_ClkInitStruct{};
 
 	/** Initializes the RCC Oscillators according to the specified parameters
 	* in the RCC_OscInitTypeDef structure.
