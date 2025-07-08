@@ -31,7 +31,7 @@ HAL_StatusTypeDef Community::Transmit(CAN_TxHeaderTypeDef *txHeader, uint8_t *tx
 	return HAL_CAN_AddTxMessage(_hcan, txHeader, txData, mailbox);
 }
 
-HAL_StatusTypeDef Community::SendSpeed(uint16_t canId, uint32_t *mailbox, float left, float right) {
+HAL_StatusTypeDef Community::SendSpeed(uint16_t canId, uint32_t &mailbox, float left, float right) {
 	CAN_TxHeaderTypeDef txHeader = {
 		.StdId = canId,
 		.ExtId = 0,
@@ -50,7 +50,7 @@ HAL_StatusTypeDef Community::SendSpeed(uint16_t canId, uint32_t *mailbox, float 
 	*reinterpret_cast<float *>(txData) = left;
 	*reinterpret_cast<float *>(txData + 4) = right;
 
-	return Transmit(&txHeader, txData, mailbox);
+	return Transmit(&txHeader, txData, &mailbox);
 }
 
 bool Community::ExecuteRxCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *rxData) {

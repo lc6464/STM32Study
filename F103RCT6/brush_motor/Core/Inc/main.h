@@ -56,11 +56,14 @@ void Error_Handler(void);
 
 void SystemClock_Config(void);
 
+void RegisterKeyButtonCallbacks();
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define KEY_Pin GPIO_PIN_0
 #define KEY_GPIO_Port GPIOC
+#define KEY_EXTI_IRQn EXTI0_IRQn
 #define LED_Pin GPIO_PIN_15
 #define LED_GPIO_Port GPIOB
 

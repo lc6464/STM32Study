@@ -57,7 +57,7 @@ public:
 	 * @param right 右速度
 	 * @return 发送状态
 	 */
-	HAL_StatusTypeDef SendSpeed(uint16_t canId, uint32_t *mailbox, float left, float right);
+	HAL_StatusTypeDef SendSpeed(uint16_t canId, uint32_t &mailbox, float left, float right);
 
 	/**
 	 * @brief 执行接收回调函数

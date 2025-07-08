@@ -85,7 +85,7 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 
 # 定义下载目标
 add_custom_target(download
-    COMMAND openocd -f interface/cmsis-dap-swd.cfg -f target/stm32f1x.cfg -c "program ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex verify reset exit"
+    COMMAND openocd -f interface/cmsis-dap-swd.cfg -f target/stm32f1x.cfg -c "program ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex verify exit"
     DEPENDS ${PROJECT_NAME}
     COMMENT "Downloading ${PROJECT_NAME}.hex to target using OpenOCD"
 )
@@ -94,7 +94,6 @@ add_custom_target(download
 file(GLOB_RECURSE ADDITIONAL_SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/Application/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/Application/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Application/*.s"
 )
 
 # 查找所有包含 .h 和 .hpp 文件的目录

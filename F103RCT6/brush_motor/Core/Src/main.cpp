@@ -17,6 +17,7 @@ int main(void) {
 	SystemClock_Config();
 
 	MX_GPIO_Init();
+
 	MX_TIM1_Init();
 	MX_TIM2_Init();
 	MX_TIM3_Init();
@@ -39,6 +40,8 @@ int main(void) {
 	rightFrontMotor.Start();
 	leftBackMotor.Start();
 	rightBackMotor.Start();
+
+	RegisterKeyButtonCallbacks();
 
 	HAL_TIM_Base_Start_IT(&htim6);
 	HAL_TIM_Base_Start_IT(&htim7);
