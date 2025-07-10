@@ -5,7 +5,8 @@
  * @param htim 编码器定时器句柄指针
  */
 Encoder::Encoder(TIM_HandleTypeDef *htim)
-	: _htim(htim), _lastCount(0), _overflowCount(0), _lastTime(0),
+	// : _htim(htim), _lastCount(0), _overflowCount(0), _lastTime(0),
+	: _htim(htim), _lastCount(0), _lastTime(0),
 	_isStopped(false), _lastUpdateTime(0), _encoderDiff(0),
 	_motorRPM(0), _outputRPM(0) {
 	assert_param(htim != nullptr);
@@ -16,12 +17,12 @@ Encoder::Encoder(TIM_HandleTypeDef *htim)
  * @return 启动状态
  */
 HAL_StatusTypeDef Encoder::Start() {
-	__HAL_TIM_ENABLE_IT(_htim, TIM_IT_UPDATE);  // 启用溢出中断
+	// __HAL_TIM_ENABLE_IT(_htim, TIM_IT_UPDATE);  // 启用溢出中断
 
 	__HAL_TIM_SET_COUNTER(_htim, 0); // 重置编码器定时器
 
 	_lastCount = 0;
-	_overflowCount = 0;
+	// _overflowCount = 0;
 	_encoderDiff = 0;
 	_motorRPM = 0;
 	_outputRPM = 0;
@@ -38,7 +39,7 @@ HAL_StatusTypeDef Encoder::Start() {
  * @return 停止状态
  */
 HAL_StatusTypeDef Encoder::Stop() {
-	__HAL_TIM_DISABLE_IT(_htim, TIM_IT_UPDATE);  // 禁用溢出中断
+	// __HAL_TIM_DISABLE_IT(_htim, TIM_IT_UPDATE);  // 禁用溢出中断
 
 	return HAL_TIM_Encoder_Stop(_htim, TIM_CHANNEL_ALL);
 }
@@ -55,11 +56,13 @@ float Encoder::Update() {
 	uint8_t isTimeOverflow = currentTime < _lastTime;
 
 	// 计算计数值位移
-	int32_t diff = static_cast<int32_t>(currentCount) - static_cast<int32_t>(_lastCount);
+	// int32_t diff = static_cast<int32_t>(currentCount) - static_cast<int32_t>(_lastCount);
+	int16_t diff_short = static_cast<int16_t>(currentCount - _lastCount);
+	int32_t diff = static_cast<int32_t>(diff_short);
 
 	// 处理溢出情况
-	diff += static_cast<int32_t>(_overflowCount) * static_cast<int32_t>(_htim->Instance->ARR + 1);
-	_overflowCount = 0;
+	// diff += static_cast<int32_t>(_overflowCount) * static_cast<int32_t>(_htim->Instance->ARR + 1);
+	// _overflowCount = 0;
 
 	// 计算时间间隔（分钟）
 	float timeDiffInMinutes = (currentTime - _lastTime) / (1000.0f * 60.0f);
@@ -76,7 +79,7 @@ float Encoder::Update() {
 				(static_cast<uint64_t>(isTimeOverflow) * UINT32_MAX) - static_cast<uint64_t>(_lastUpdateTime);
 			if (timeSinceLastUpdate >= 200) {
 				_lastCount = 0;
-				_overflowCount = 0;
+				// _overflowCount = 0;
 				_encoderDiff = 0;
 				_motorRPM = 0;
 				_outputRPM = 0;
@@ -121,11 +124,11 @@ bool Encoder::OverflowCallback(const TIM_HandleTypeDef *htim) {
 	// 如果是当前编码器的定时器
 	if (_htim->Instance == htim->Instance) {
 		// 检查方向
-		if (__HAL_TIM_IS_TIM_COUNTING_DOWN(_htim)) {
-			_overflowCount--;  // 向下计数时溢出
-		} else {
-			_overflowCount++;  // 向上计数时溢出
-		}
+		// if (__HAL_TIM_IS_TIM_COUNTING_DOWN(_htim)) {
+		// 	_overflowCount--;  // 向下计数时溢出
+		// } else {
+		// 	_overflowCount++;  // 向上计数时溢出
+		// }
 		return true;
 	}
 

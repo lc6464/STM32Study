@@ -25,8 +25,8 @@ inline bool MotorSpeed_ReceivedCallback(CAN_RxHeaderTypeDef *rxHeader, uint8_t *
 			// 从 rxData 中解析出数据
 			Status::leftFrontSpeed = *reinterpret_cast<float *>(rxData);
 			Status::rightFrontSpeed = *reinterpret_cast<float *>(rxData + 4);
-			Status::leftBackSpeed = Status::leftFrontSpeed;  // 暂定左后轮实际速度与左前轮相同
-			Status::rightBackSpeed = Status::rightFrontSpeed; // 暂定右后轮实际速度与右前轮相同
+			// Status::leftBackSpeed = Status::leftFrontSpeed;  // 暂定左后轮实际速度与左前轮相同
+			// Status::rightBackSpeed = Status::rightFrontSpeed; // 暂定右后轮实际速度与右前轮相同
 
 			return true;
 		}
