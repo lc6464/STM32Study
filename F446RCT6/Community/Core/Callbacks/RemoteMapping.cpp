@@ -10,8 +10,8 @@ constexpr float MIN_INPUT_THRESHOLD = 20.0f; // 最小输入阈值
 constexpr float SMOOTH_FACTOR = 0.75f; // 平滑因子
 
 // 定义低速和高速的最大速度
-constexpr float LOW_SPEED_MAX = 200.0f;
-constexpr float HIGH_SPEED_MAX = 300.0f;
+constexpr float LOW_SPEED_MAX = 300.0f;
+constexpr float HIGH_SPEED_MAX = 500.0f;
 
 // 声明上一次的电机速度为静态变量
 static float lastLeftMotorSpeed = 0.0f;
@@ -105,9 +105,9 @@ bool MapRightStickToMotorSpeed(int16_t rightX, int16_t rightY, float &leftMotorS
 		}
 	}
 
-	// 限制电机速度范围，顺便取反
-	leftMotorSpeed = -std::clamp(leftMotorSpeed, -maxTargetSpeed, maxTargetSpeed);
-	rightMotorSpeed = -std::clamp(rightMotorSpeed, -maxTargetSpeed, maxTargetSpeed);
+	// 限制电机速度范围
+	leftMotorSpeed = std::clamp(leftMotorSpeed, -maxTargetSpeed, maxTargetSpeed);
+	rightMotorSpeed = std::clamp(rightMotorSpeed, -maxTargetSpeed, maxTargetSpeed);
 
 	return false;
 }
@@ -135,8 +135,8 @@ bool MapDualStickToMotorSpeed(int16_t leftY, int16_t rightY, float &leftMotorSpe
 
 		return true;
 	} else {
-		leftMotorSpeed = -std::clamp(static_cast<float>(leftY) / MAX_REMOTE_VALUE * maxTargetSpeed, -maxTargetSpeed, maxTargetSpeed);
-		rightMotorSpeed = -std::clamp(static_cast<float>(rightY) / MAX_REMOTE_VALUE * maxTargetSpeed, -maxTargetSpeed, maxTargetSpeed);
+		leftMotorSpeed = std::clamp(static_cast<float>(leftY) / MAX_REMOTE_VALUE * maxTargetSpeed, -maxTargetSpeed, maxTargetSpeed);
+		rightMotorSpeed = std::clamp(static_cast<float>(rightY) / MAX_REMOTE_VALUE * maxTargetSpeed, -maxTargetSpeed, maxTargetSpeed);
 	}
 
 	return false;
